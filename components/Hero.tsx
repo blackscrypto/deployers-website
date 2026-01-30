@@ -2,11 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { ArrowRight, Sparkles } from 'lucide-react'
-import { useEffect, useState, useRef, useLayoutEffect } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
+import { useEffect, useState } from 'react'
 
 interface Particle {
   id: number
@@ -17,10 +13,6 @@ interface Particle {
 
 export default function Hero() {
   const [particles, setParticles] = useState<Particle[]>([])
-  const heroRef = useRef<HTMLElement>(null)
-  const backgroundRef = useRef<HTMLDivElement>(null)
-  const orbsRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Generate star-like particles
@@ -31,57 +23,6 @@ export default function Hero() {
       size: Math.random() * 2 + 1,
     }))
     setParticles(newParticles)
-  }, [])
-
-  // GSAP Parallax effect
-  useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      // Parallax for background particles (moves slower)
-      if (backgroundRef.current) {
-        gsap.to(backgroundRef.current, {
-          y: 200,
-          ease: "none",
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: 1,
-          },
-        })
-      }
-
-      // Parallax for orbs (moves even slower)
-      if (orbsRef.current) {
-        gsap.to(orbsRef.current, {
-          y: 300,
-          scale: 1.2,
-          ease: "none",
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: 1.5,
-          },
-        })
-      }
-
-      // Content moves up slightly faster (creates depth)
-      if (contentRef.current) {
-        gsap.to(contentRef.current, {
-          y: -50,
-          opacity: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: "top top",
-            end: "50% top",
-            scrub: 0.5,
-          },
-        })
-      }
-    }, heroRef)
-
-    return () => ctx.revert()
   }, [])
 
   const containerVariants = {
@@ -109,9 +50,9 @@ export default function Hero() {
   }
 
   return (
-    <section ref={heroRef} className="relative min-h-screen flex items-center justify-center px-6 pt-32 pb-20 bg-transparent overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center px-6 pt-32 pb-20 bg-transparent">
       {/* Animated Background - Star particles */}
-      <div ref={backgroundRef} className="absolute inset-0 pointer-events-none" style={{ height: '150vh' }}>
+      <div className="absolute inset-0 pointer-events-none" style={{ height: '150vh' }}>
         {/* Star-like particles with enhanced glow */}
         {particles.map((particle) => (
           <motion.div
@@ -143,7 +84,7 @@ export default function Hero() {
       </div>
 
       {/* Central Glowing Orb - Like reference image */}
-      <div ref={orbsRef} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
         {/* Main blue glow */}
         <motion.div
           animate={{
@@ -199,7 +140,6 @@ export default function Hero() {
         />
       </div>
       <motion.div
-        ref={contentRef}
         variants={containerVariants}
         initial="hidden"
         animate="visible"

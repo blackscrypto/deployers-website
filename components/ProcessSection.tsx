@@ -2,17 +2,13 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageSquare, Target, Map, Code, Rocket } from 'lucide-react'
-import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { 
   SiSlack, SiDiscord, SiNotion, SiStripe, SiGithub, SiGoogle, 
   SiWhatsapp, SiOpenai, SiZapier, SiAirtable, SiFigma, SiVercel,
   SiHubspot, SiShopify, SiTwilio, SiMailchimp, SiAsana, SiTrello,
   SiDropbox, SiLinkedin
 } from 'react-icons/si'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
 
 // Sound effects utility
 const playSound = (type: 'hover' | 'success' | 'pop' | 'whoosh') => {
@@ -750,64 +746,22 @@ const visualComponents: { [key: string]: React.FC<{ isHovered: boolean }> } = {
 
 export default function ProcessSection() {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-  const sectionRef = useRef<HTMLElement>(null)
-  const cardsRef = useRef<HTMLDivElement[]>([])
-  const titleRef = useRef<HTMLDivElement>(null)
-
-  // GSAP Staggered Animation on Scroll
-  useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      // Title animation
-      if (titleRef.current) {
-        gsap.from(titleRef.current, {
-          y: 60,
-          opacity: 0,
-          duration: 1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: titleRef.current,
-            start: "top 80%",
-            toggleActions: "play none none reverse",
-          },
-        })
-      }
-
-      // Cards staggered animation
-      if (cardsRef.current.length > 0) {
-        gsap.from(cardsRef.current, {
-          y: 80,
-          opacity: 0,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 60%",
-            toggleActions: "play none none reverse",
-          },
-        })
-      }
-    }, sectionRef)
-
-    return () => ctx.revert()
-  }, [])
-
-  // Add ref to cards array
-  const addToCardsRef = (el: HTMLDivElement | null) => {
-    if (el && !cardsRef.current.includes(el)) {
-      cardsRef.current.push(el)
-    }
-  }
 
   return (
-    <section ref={sectionRef} id="process" className="relative px-6 py-20">
+    <section id="process" className="relative px-6 py-20">
       <div className="max-w-7xl mx-auto w-full">
         {/* Section Title */}
-        <div ref={titleRef} className="mb-20">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, type: "spring", stiffness: 70, damping: 20 }}
+          className="mb-20"
+        >
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white">
             Our Process
           </h2>
-        </div>
+        </motion.div>
 
         {/* Process Steps Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -816,31 +770,34 @@ export default function ProcessSection() {
             const isHovered = hoveredCard === step.number
             
             return (
-              <div
+              <motion.div
                 key={step.number}
-                ref={addToCardsRef}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.8,
+                  delay: index * 0.1,
+                  type: "spring",
+                  stiffness: 70,
+                  damping: 20,
+                }}
+                whileHover={{
+                  y: -8,
+                  transition: { duration: 0.3, type: "spring", stiffness: 300, damping: 20 },
+                }}
                 onMouseEnter={() => {
                   setHoveredCard(step.number)
                   playSound('hover')
                 }}
                 onMouseLeave={() => setHoveredCard(null)}
-                className="group relative bg-white/[0.01] backdrop-blur-sm rounded-2xl p-6 transition-all duration-500 cursor-pointer"
-                style={{
-                  border: isHovered 
-                    ? '1px solid rgba(127, 156, 245, 0.4)' 
-                    : '1px solid rgba(255, 255, 255, 0.03)',
-                  boxShadow: isHovered 
-                    ? '0 0 30px rgba(127, 156, 245, 0.15), inset 0 0 30px rgba(127, 156, 245, 0.03)' 
-                    : 'none',
-                  transform: isHovered ? 'translateY(-8px)' : 'translateY(0)',
-                }}
+                className="group relative bg-white/[0.01] backdrop-blur-sm border border-white/[0.03] rounded-2xl p-6 hover:border-deployers-blue/20 transition-all duration-500"
               >
                 {/* Glow effect on hover */}
                 <motion.div
                   animate={{
-                    opacity: isHovered ? 0.08 : 0,
+                    opacity: isHovered ? 0.05 : 0,
                   }}
-                  transition={{ duration: 0.3 }}
                   className="absolute inset-0 rounded-2xl bg-deployers-blue"
                 />
                 
@@ -853,15 +810,14 @@ export default function ProcessSection() {
 
                   {/* Number & Title Row */}
                   <div className="flex items-start gap-4 mb-3">
-                    <span
-                      className="text-3xl font-bold transition-colors duration-500"
-                      style={{
-                        color: isHovered ? 'rgba(127, 156, 245, 0.8)' : 'rgba(127, 156, 245, 0.3)',
-                        textShadow: isHovered ? '0 0 20px rgba(127, 156, 245, 0.5)' : 'none',
+                    <motion.span
+                      animate={{
+                        color: isHovered ? 'rgba(127, 156, 245, 0.7)' : 'rgba(127, 156, 245, 0.3)',
                       }}
+                      className="text-3xl font-bold transition-colors duration-500"
                     >
                       {step.number}
-                    </span>
+                    </motion.span>
                     <h3 className="text-xl font-bold text-white group-hover:text-deployers-light transition-colors duration-300 pt-1">
                       {step.title}
                     </h3>
@@ -877,12 +833,10 @@ export default function ProcessSection() {
                 <motion.div
                   animate={{
                     opacity: isHovered ? 1 : 0,
-                    scaleX: isHovered ? 1 : 0,
                   }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-deployers-blue/60 to-transparent origin-center"
+                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-deployers-blue/50 to-transparent"
                 />
-              </div>
+              </motion.div>
             )
           })}
         </div>
