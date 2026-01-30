@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    @apply bg-black text-white antialiased;
+    overflow-x: hidden;
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Remove any section gaps and ensure uniform background */
+  section {
+    @apply relative bg-transparent;
+  }
+  
+  main {
+    @apply bg-midnight-darker;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .glow-blue {
+    box-shadow: 0 0 40px rgba(127, 156, 245, 0.4),
+                0 0 80px rgba(127, 156, 245, 0.2);
+  }
+  
+  .glow-blue-intense {
+    box-shadow: 0 0 60px rgba(127, 156, 245, 0.6),
+                0 0 120px rgba(127, 156, 245, 0.3);
+  }
+}
