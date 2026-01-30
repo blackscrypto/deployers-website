@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import CustomCursor from '@/components/CustomCursor'
-import SmoothScroll from '@/components/SmoothScroll'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,12 +16,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <body className={inter.className}>
-        <SmoothScroll>
-          <CustomCursor />
-          {children}
-        </SmoothScroll>
+        <CustomCursor />
+        {children}
       </body>
     </html>
   )
