@@ -47,7 +47,7 @@ export default function ContactSection() {
   `
 
   return (
-    <section id="contact" className="relative px-6 py-20">
+    <section id="contact" className="relative px-6 py-20 bg-[#03060f]">
       <div className="max-w-7xl mx-auto w-full">
         {/* Section Title */}
         <motion.div
@@ -57,9 +57,17 @@ export default function ContactSection() {
           transition={{ duration: 0.8, type: "spring", stiffness: 70, damping: 20 }}
           className="text-center mb-20"
         >
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
-            Let's Talk
-          </h2>
+          <div className="relative inline-block">
+            {/* Shine effect overlay */}
+            <div className="absolute inset-0 pointer-events-none select-none z-10" aria-hidden="true">
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold headline text-shine-effect">
+                Let's Talk
+              </h2>
+            </div>
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 headline relative">
+              Let's Talk
+            </h2>
+          </div>
           <p className="text-xl text-slate-400 max-w-2xl mx-auto">
             Ready to transform your business with AI? Tell us about your project and let's build something amazing together.
           </p>

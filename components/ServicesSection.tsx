@@ -733,8 +733,15 @@ export default function ServicesSection() {
   return (
     <section 
       id="services" 
-      className="relative px-6 py-32"
+      className="relative px-6 py-32 bg-[#03060f]"
     >
+      {/* Smooth gradient fade-out at the bottom */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-10"
+        style={{
+          background: 'linear-gradient(to bottom, transparent 0%, rgba(3, 6, 15, 0.5) 40%, rgba(3, 6, 15, 1) 100%)',
+        }}
+      />
 
       <div className="max-w-7xl mx-auto w-full">
         {/* Section Title */}
@@ -743,9 +750,15 @@ export default function ServicesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, type: "spring", stiffness: 70, damping: 20 }}
-          className="mb-20"
+          className="mb-20 relative"
         >
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white">
+          {/* Shine effect overlay */}
+          <div className="absolute inset-0 pointer-events-none select-none z-10" aria-hidden="true">
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold headline text-shine-effect">
+              Our Services
+            </h2>
+          </div>
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white headline relative">
             Our Services
           </h2>
         </motion.div>

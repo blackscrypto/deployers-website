@@ -11,6 +11,7 @@
   body {
     @apply bg-black text-white antialiased;
     overflow-x: hidden;
+    font-feature-settings: 'ss01' 1;
   }
   
   /* Smooth scrolling */
@@ -33,6 +34,17 @@
     text-wrap: balance;
   }
   
+  /* Premium typography - Single story 'a' */
+  .font-premium {
+    font-feature-settings: 'ss01' 1;
+  }
+  
+  /* Headlines with tight tracking */
+  .headline {
+    font-feature-settings: 'ss01' 1;
+    letter-spacing: -0.025em;
+  }
+  
   .glow-blue {
     box-shadow: 0 0 40px rgba(127, 156, 245, 0.4),
                 0 0 80px rgba(127, 156, 245, 0.2);
@@ -42,4 +54,80 @@
     box-shadow: 0 0 60px rgba(127, 156, 245, 0.6),
                 0 0 120px rgba(127, 156, 245, 0.3);
   }
+  
+  /* Slow spin animation for gradient border */
+  .animate-spin-slow {
+    animation: spin-slow 4s linear infinite;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes text-shine {
+  0% {
+    background-position: 200% center;
+    opacity: 1;
+  }
+  100% {
+    background-position: -200% center;
+    opacity: 1;
+  }
+}
+
+@keyframes text-shine-appear {
+  0% {
+    opacity: 0;
+  }
+  1% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Logos marquee: infinite scroll, never stops, no hover change to avoid any reset */
+@keyframes logos-row1 {
+  from { transform: translateX(0); }
+  to { transform: translateX(-520px); }
+}
+@keyframes logos-row2 {
+  from { transform: translateX(-520px); }
+  to { transform: translateX(0); }
+}
+.logos-marquee-row1 {
+  animation: logos-row1 25s linear infinite;
+  will-change: transform;
+}
+.logos-marquee-row2 {
+  animation: logos-row2 23s linear infinite;
+  will-change: transform;
+}
+
+.text-shine-effect {
+  animation: 
+    text-shine-appear 0s 1.8s forwards,
+    text-shine 2s ease-out 1.8s forwards;
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 20%,
+    rgba(255, 255, 255, 1) 50%,
+    transparent 80%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-position: 200% center;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
 }

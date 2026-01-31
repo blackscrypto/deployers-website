@@ -1,26 +1,38 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, useScroll, useTransform, AnimatePresence, type MotionValue } from 'framer-motion'
 import { MessageSquare, Target, Map, Code, Rocket } from 'lucide-react'
-import { useState, useRef, useEffect, useCallback } from 'react'
-import { 
-  SiSlack, SiDiscord, SiNotion, SiStripe, SiGithub, SiGoogle, 
-  SiWhatsapp, SiOpenai, SiZapier, SiAirtable, SiFigma, SiVercel,
-  SiHubspot, SiShopify, SiTwilio, SiMailchimp, SiAsana, SiTrello,
-  SiDropbox, SiLinkedin
+import {
+  SiSlack,
+  SiDiscord,
+  SiNotion,
+  SiStripe,
+  SiGithub,
+  SiGoogle,
+  SiWhatsapp,
+  SiOpenai,
+  SiZapier,
+  SiAirtable,
+  SiFigma,
+  SiVercel,
+  SiHubspot,
+  SiShopify,
+  SiTwilio,
+  SiMailchimp,
+  SiAsana,
+  SiTrello,
+  SiDropbox,
+  SiLinkedin,
 } from 'react-icons/si'
+import { useRef, useState, useEffect } from 'react'
 
-// Sound effects utility
 const playSound = (type: 'hover' | 'success' | 'pop' | 'whoosh') => {
   if (typeof window === 'undefined') return
-  
   const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
   const oscillator = audioContext.createOscillator()
   const gainNode = audioContext.createGain()
-  
   oscillator.connect(gainNode)
   gainNode.connect(audioContext.destination)
-  
   switch (type) {
     case 'hover':
       oscillator.frequency.value = 800
@@ -97,56 +109,43 @@ const processSteps = [
   },
 ]
 
-// 01. Chat Visual - Messages appear on hover
-const ChatVisual = ({ isHovered }: { isHovered: boolean }) => {
+// 01. Chat Visual
+const ChatVisual = ({ isHovered }: { isHovered: boolean; scrollProgress?: MotionValue<number> }) => {
   const messages = [
     { id: 1, side: 'left', text: 'How can AI help my business?', delay: 0 },
     { id: 2, side: 'right', text: 'Let me analyze your workflow...', delay: 0.8 },
     { id: 3, side: 'left', text: "That sounds great!", delay: 1.6 },
     { id: 4, side: 'right', text: "Let's schedule a call! 🚀", delay: 2.4 },
   ]
-
   const [visibleMessages, setVisibleMessages] = useState<number[]>([])
   const [typing, setTyping] = useState<'left' | 'right' | null>(null)
   const timeoutsRef = useRef<NodeJS.Timeout[]>([])
 
   useEffect(() => {
-    // Clear all timeouts when hover state changes
-    timeoutsRef.current.forEach(timeout => clearTimeout(timeout))
+    timeoutsRef.current.forEach((t) => clearTimeout(t))
     timeoutsRef.current = []
-
     if (isHovered) {
       setVisibleMessages([])
       setTyping(null)
-      
       messages.forEach((msg) => {
-        // Show typing indicator
-        const typingTimeout = setTimeout(() => {
-          if (isHovered) {
-            setTyping(msg.side as 'left' | 'right')
-            playSound('pop')
-          }
+        const typingT = setTimeout(() => {
+          if (isHovered) setTyping(msg.side as 'left' | 'right')
         }, msg.delay * 1000)
-        timeoutsRef.current.push(typingTimeout)
-        
-        // Show message
-        const messageTimeout = setTimeout(() => {
+        timeoutsRef.current.push(typingT)
+        const msgT = setTimeout(() => {
           if (isHovered) {
             setTyping(null)
-            setVisibleMessages(prev => [...prev, msg.id])
+            setVisibleMessages((prev) => [...prev, msg.id])
             playSound('pop')
           }
         }, (msg.delay + 0.5) * 1000)
-        timeoutsRef.current.push(messageTimeout)
+        timeoutsRef.current.push(msgT)
       })
     } else {
       setVisibleMessages([])
       setTyping(null)
     }
-
-    return () => {
-      timeoutsRef.current.forEach(timeout => clearTimeout(timeout))
-    }
+    return () => timeoutsRef.current.forEach((t) => clearTimeout(t))
   }, [isHovered])
 
   return (
@@ -155,7 +154,6 @@ const ChatVisual = ({ isHovered }: { isHovered: boolean }) => {
         <AnimatePresence>
           {messages.map((msg) => (
             <div key={msg.id}>
-              {/* Typing indicator */}
               {typing === msg.side && !visibleMessages.includes(msg.id) && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -175,13 +173,11 @@ const ChatVisual = ({ isHovered }: { isHovered: boolean }) => {
                   </div>
                 </motion.div>
               )}
-              
-              {/* Message */}
               {visibleMessages.includes(msg.id) && (
                 <motion.div
                   initial={{ opacity: 0, y: 10, scale: 0.9 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                   className={`flex gap-2 items-start ${msg.side === 'right' ? 'justify-end' : ''}`}
                 >
                   {msg.side === 'left' && <div className="w-5 h-5 rounded-full bg-deployers-blue/30 flex-shrink-0" />}
@@ -199,11 +195,11 @@ const ChatVisual = ({ isHovered }: { isHovered: boolean }) => {
   )
 }
 
-// 02. Logos Marquee Visual
-const LogosVisual = ({ isHovered }: { isHovered: boolean }) => {
+// 02. Logos Visual
+const LogosVisual = ({ isHovered, scrollProgress }: { isHovered: boolean; scrollProgress?: MotionValue<number> }) => {
   const [hoveredLogo, setHoveredLogo] = useState<string | null>(null)
-  
-  // Row 1 logos with real icons
+  // Ligne plus rapide : atteint 100% à 35% du scroll (quand tu dépasses le 2e container elle est déjà passée)
+  const lineX = scrollProgress ? useTransform(scrollProgress, [0, 0.35], ['0%', '100%']) : null
   const logosRow1 = [
     { name: 'OpenAI', Icon: SiOpenai, color: '#10a37f' },
     { name: 'Slack', Icon: SiSlack, color: '#4A154B' },
@@ -216,8 +212,6 @@ const LogosVisual = ({ isHovered }: { isHovered: boolean }) => {
     { name: 'Google', Icon: SiGoogle, color: '#4285F4' },
     { name: 'WhatsApp', Icon: SiWhatsapp, color: '#25D366' },
   ]
-  
-  // Row 2 logos (different set)
   const logosRow2 = [
     { name: 'Zapier', Icon: SiZapier, color: '#FF4A00' },
     { name: 'Airtable', Icon: SiAirtable, color: '#18BFFF' },
@@ -230,87 +224,98 @@ const LogosVisual = ({ isHovered }: { isHovered: boolean }) => {
     { name: 'Dropbox', Icon: SiDropbox, color: '#0061FF' },
     { name: 'LinkedIn', Icon: SiLinkedin, color: '#0A66C2' },
   ]
-
   const row1 = [...logosRow1, ...logosRow1, ...logosRow1]
   const row2 = [...logosRow2, ...logosRow2, ...logosRow2]
 
   return (
-    <div className="relative w-full h-44 bg-gradient-to-br from-white/[0.02] to-transparent rounded-xl border border-white/[0.05] overflow-hidden">
-      {/* Row 1 - moves right */}
-      <div className="absolute top-5 left-0 right-0 h-12">
-        <motion.div
-          animate={{ x: isHovered ? [0, -640] : 0 }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="flex gap-3"
-        >
-          {row1.map((logo, i) => (
-            <motion.div
-              key={`row1-${i}`}
-              onMouseEnter={() => {
-                setHoveredLogo(`row1-${i}`)
-                playSound('hover')
-              }}
-              onMouseLeave={() => setHoveredLogo(null)}
-              whileHover={{ scale: 1.15 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className={`flex-shrink-0 w-10 h-10 rounded-lg border flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                hoveredLogo === `row1-${i}`
-                  ? 'border-white/30 bg-white/10'
-                  : 'border-white/[0.05] bg-white/[0.02]'
-              }`}
-              style={{
-                color: hoveredLogo === `row1-${i}` ? logo.color : 'rgba(255,255,255,0.3)',
-                boxShadow: hoveredLogo === `row1-${i}` ? `0 0 20px ${logo.color}40` : 'none',
-              }}
-            >
-              <logo.Icon className="w-5 h-5" />
-            </motion.div>
-          ))}
-        </motion.div>
+    <div className="logos-marquee-container relative w-full h-52 bg-gradient-to-br from-white/[0.02] to-transparent rounded-xl border border-white/[0.05] overflow-hidden flex flex-col items-center justify-center py-2">
+      {/* Row 1: infinite scroll right → left, never stops — hauteur pour logo + scale + glow */}
+      <div className="w-full h-[5.5rem] overflow-hidden flex items-center justify-center shrink-0">
+        <div className="overflow-hidden h-full w-full flex items-center justify-center">
+          <div key="logos-row1" className="logos-marquee-row1 flex gap-3 w-max items-center py-4" style={{ width: 'max-content' }}>
+            {row1.map((logo, i) => {
+              const key = `r1-${i}`
+              const isLogoHovered = hoveredLogo === key
+              return (
+                <motion.div
+                  key={key}
+                  onMouseEnter={() => setHoveredLogo(key)}
+                  onMouseLeave={() => setHoveredLogo(null)}
+                  whileHover={{ scale: 1.15 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  className={`flex-shrink-0 w-10 h-10 rounded-lg border flex items-center justify-center cursor-pointer transition-colors duration-200 ${
+                    isLogoHovered ? 'border-white/30 bg-white/10' : 'border-white/[0.05] bg-white/[0.02]'
+                  }`}
+                  style={{
+                    color: isLogoHovered ? logo.color : 'rgba(255,255,255,0.3)',
+                    boxShadow: isLogoHovered ? `0 0 20px ${logo.color}40` : 'none',
+                  }}
+                >
+                  <logo.Icon className="w-5 h-5" />
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
       </div>
-
-      {/* Row 2 - moves left */}
-      <div className="absolute top-[72px] left-0 right-0 h-12">
-        <motion.div
-          animate={{ x: isHovered ? [-640, 0] : -320 }}
-          transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-          className="flex gap-3"
-        >
-          {row2.map((logo, i) => (
-            <motion.div
-              key={`row2-${i}`}
-              onMouseEnter={() => {
-                setHoveredLogo(`row2-${i}`)
-                playSound('hover')
-              }}
-              onMouseLeave={() => setHoveredLogo(null)}
-              whileHover={{ scale: 1.15 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className={`flex-shrink-0 w-10 h-10 rounded-lg border flex items-center justify-center cursor-pointer transition-all duration-200 ${
-                hoveredLogo === `row2-${i}`
-                  ? 'border-white/30 bg-white/10'
-                  : 'border-white/[0.05] bg-white/[0.02]'
-              }`}
-              style={{
-                color: hoveredLogo === `row2-${i}` ? logo.color : 'rgba(255,255,255,0.3)',
-                boxShadow: hoveredLogo === `row2-${i}` ? `0 0 20px ${logo.color}40` : 'none',
-              }}
-            >
-              <logo.Icon className="w-5 h-5" />
-            </motion.div>
-          ))}
-        </motion.div>
+      {/* Ligne glow entre les deux lignes — se déplace de gauche à droite avec le scroll */}
+      <div className="h-4 shrink-0 relative flex items-center justify-center w-full px-2">
+        <div
+          className="absolute left-0 right-0 h-[2px] rounded-full opacity-30"
+          style={{
+            background: 'linear-gradient(90deg, transparent 0%, rgba(127, 156, 245, 0.4) 50%, transparent 100%)',
+            boxShadow: '0 0 8px rgba(127, 156, 245, 0.2)',
+          }}
+        />
+        {lineX && (
+          <motion.div
+            className="absolute h-[3px] w-20 rounded-full pointer-events-none"
+            style={{
+              left: lineX,
+              transform: 'translateX(-50%)',
+              background: 'linear-gradient(90deg, transparent, rgba(127, 156, 245, 0.9), transparent)',
+              boxShadow: '0 0 16px rgba(127, 156, 245, 0.6), 0 0 32px rgba(127, 156, 245, 0.3)',
+            }}
+          />
+        )}
       </div>
-
-      {/* Fade edges */}
+      {/* Row 2: infinite scroll left → right, never stops */}
+      <div className="w-full h-[5.5rem] overflow-hidden flex items-center justify-center shrink-0">
+        <div className="overflow-hidden h-full w-full flex items-center justify-center">
+          <div key="logos-row2" className="logos-marquee-row2 flex gap-3 w-max items-center py-4" style={{ width: 'max-content' }}>
+          {row2.map((logo, i) => {
+            const key = `r2-${i}`
+            const isLogoHovered = hoveredLogo === key
+            return (
+              <motion.div
+                key={key}
+                onMouseEnter={() => setHoveredLogo(key)}
+                onMouseLeave={() => setHoveredLogo(null)}
+                whileHover={{ scale: 1.15 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                className={`flex-shrink-0 w-10 h-10 rounded-lg border flex items-center justify-center cursor-pointer transition-colors duration-200 ${
+                  isLogoHovered ? 'border-white/30 bg-white/10' : 'border-white/[0.05] bg-white/[0.02]'
+                }`}
+                style={{
+                  color: isLogoHovered ? logo.color : 'rgba(255,255,255,0.3)',
+                  boxShadow: isLogoHovered ? `0 0 20px ${logo.color}40` : 'none',
+                }}
+              >
+                <logo.Icon className="w-5 h-5" />
+              </motion.div>
+            )
+          })}
+          </div>
+        </div>
+      </div>
       <div className="absolute top-0 left-0 w-8 h-full bg-gradient-to-r from-[#030712] to-transparent z-10 pointer-events-none" />
       <div className="absolute top-0 right-0 w-8 h-full bg-gradient-to-l from-[#030712] to-transparent z-10 pointer-events-none" />
     </div>
   )
 }
 
-// 03. Roadmap Visual - Progress bar on hover
-const RoadmapVisual = ({ isHovered }: { isHovered: boolean }) => {
+// 03. Roadmap Visual
+const RoadmapVisual = ({ isHovered }: { isHovered: boolean; scrollProgress?: MotionValue<number> }) => {
   const phases = ['Discovery', 'Planning', 'Execution', 'Launch']
   const [progress, setProgress] = useState(0)
   const [activePhase, setActivePhase] = useState(-1)
@@ -318,80 +323,51 @@ const RoadmapVisual = ({ isHovered }: { isHovered: boolean }) => {
   const timeoutsRef = useRef<NodeJS.Timeout[]>([])
 
   useEffect(() => {
-    // Clear all timers when hover state changes
     if (intervalRef.current) clearInterval(intervalRef.current)
-    timeoutsRef.current.forEach(timeout => clearTimeout(timeout))
+    timeoutsRef.current.forEach((t) => clearTimeout(t))
     timeoutsRef.current = []
-
     if (isHovered) {
       setProgress(0)
       setActivePhase(-1)
-      
-      // Animate progress
       intervalRef.current = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 100) {
-            if (intervalRef.current) clearInterval(intervalRef.current)
-            return 100
-          }
-          return prev + 2
-        })
+        setProgress((prev) => (prev >= 100 ? (clearInterval(intervalRef.current!), 100) : prev + 2))
       }, 40)
-
-      // Activate phases
       phases.forEach((_, i) => {
-        const timeout = setTimeout(() => {
+        const t = setTimeout(() => {
           if (isHovered) {
             setActivePhase(i)
             playSound('success')
           }
         }, (i + 1) * 500)
-        timeoutsRef.current.push(timeout)
+        timeoutsRef.current.push(t)
       })
     } else {
       setProgress(0)
       setActivePhase(-1)
     }
-
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
-      timeoutsRef.current.forEach(timeout => clearTimeout(timeout))
+      timeoutsRef.current.forEach((t) => clearTimeout(t))
     }
   }, [isHovered])
 
   return (
     <div className="relative w-full h-44 bg-gradient-to-br from-white/[0.02] to-transparent rounded-xl overflow-hidden border border-white/[0.05] p-4">
-      {/* Progress percentage */}
       <div className="text-right mb-2">
-        <motion.span 
-          className="text-2xl font-bold text-deployers-blue"
-          key={progress}
-        >
-          {progress}%
-        </motion.span>
+        <motion.span className="text-2xl font-bold text-deployers-blue" key={progress}>{progress}%</motion.span>
       </div>
-
-      {/* Progress bar */}
       <div className="relative h-2 bg-white/[0.05] rounded-full mb-6 overflow-hidden">
         <motion.div
           className="absolute top-0 left-0 h-full bg-gradient-to-r from-deployers-blue to-deployers-light rounded-full"
           style={{ width: `${progress}%` }}
           transition={{ duration: 0.1 }}
         />
-        {/* Glow effect */}
-        <motion.div
-          className="absolute top-0 h-full w-8 bg-white/50 blur-sm rounded-full"
-          style={{ left: `${progress - 4}%` }}
-        />
       </div>
-
-      {/* Phases */}
       <div className="flex justify-between">
         {phases.map((phase, i) => (
           <motion.div
             key={phase}
-            initial={{ opacity: 0.3 }}
-            animate={{ 
+            animate={{
               opacity: activePhase >= i ? 1 : 0.3,
               scale: activePhase === i ? 1.1 : 1,
             }}
@@ -404,142 +380,63 @@ const RoadmapVisual = ({ isHovered }: { isHovered: boolean }) => {
               }}
               className="w-6 h-6 rounded-full flex items-center justify-center"
             >
-              {activePhase >= i && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="text-white text-xs"
-                >
-                  ✓
-                </motion.span>
-              )}
+              {activePhase >= i && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-white text-xs">✓</motion.span>}
             </motion.div>
-            <span className={`text-[10px] ${activePhase >= i ? 'text-deployers-light' : 'text-slate-500'}`}>
-              {phase}
-            </span>
+            <span className={`text-[10px] ${activePhase >= i ? 'text-deployers-light' : 'text-slate-500'}`}>{phase}</span>
           </motion.div>
-        ))}
-      </div>
-
-      {/* Connection lines */}
-      <div className="absolute top-[72px] left-[40px] right-[40px] h-[2px] flex justify-between">
-        {[0, 1, 2].map((i) => (
-          <motion.div
-            key={i}
-            className="flex-1 mx-1"
-            animate={{
-              backgroundColor: activePhase > i ? 'rgba(127, 156, 245, 0.5)' : 'rgba(255, 255, 255, 0.05)',
-            }}
-          />
         ))}
       </div>
     </div>
   )
 }
 
-// 04. Blocks Visual - Blocks assembling
-const BlocksVisual = ({ isHovered }: { isHovered: boolean }) => {
+// 04. Blocks Visual
+const BlocksVisual = ({ isHovered }: { isHovered: boolean; scrollProgress?: MotionValue<number> }) => {
   const blocks = [
     { id: 1, label: 'API', color: '#7F9CF5', x: -80, y: -40 },
     { id: 2, label: 'AI', color: '#10a37f', x: 80, y: -40 },
     { id: 3, label: 'DB', color: '#FF6B6B', x: -80, y: 40 },
     { id: 4, label: 'UI', color: '#9B59B6', x: 80, y: 40 },
   ]
-
   const [assembled, setAssembled] = useState(false)
   const [connected, setConnected] = useState(false)
   const timeoutsRef = useRef<NodeJS.Timeout[]>([])
 
   useEffect(() => {
-    // Clear all timeouts when hover state changes
-    timeoutsRef.current.forEach(timeout => clearTimeout(timeout))
+    timeoutsRef.current.forEach((t) => clearTimeout(t))
     timeoutsRef.current = []
-
     if (isHovered) {
       setAssembled(false)
       setConnected(false)
-      
-      const assembleTimeout = setTimeout(() => {
-        if (isHovered) {
-          setAssembled(true)
-          playSound('whoosh')
-        }
-      }, 100)
-      timeoutsRef.current.push(assembleTimeout)
-      
-      const connectTimeout = setTimeout(() => {
-        if (isHovered) {
-          setConnected(true)
-          playSound('success')
-        }
-      }, 800)
-      timeoutsRef.current.push(connectTimeout)
+      timeoutsRef.current.push(setTimeout(() => isHovered && (setAssembled(true), playSound('whoosh')), 100))
+      timeoutsRef.current.push(setTimeout(() => isHovered && (setConnected(true), playSound('success')), 800))
     } else {
       setAssembled(false)
       setConnected(false)
     }
-
-    return () => {
-      timeoutsRef.current.forEach(timeout => clearTimeout(timeout))
-    }
+    return () => timeoutsRef.current.forEach((t) => clearTimeout(t))
   }, [isHovered])
 
   return (
     <div className="relative w-full h-44 bg-gradient-to-br from-white/[0.02] to-transparent rounded-xl overflow-hidden border border-white/[0.05]">
       <div className="absolute inset-0 flex items-center justify-center">
-        {/* Connection lines */}
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 150">
           {connected && (
             <>
-              <motion.line
-                x1="70" y1="55" x2="100" y2="75"
-                stroke="rgba(127, 156, 245, 0.5)"
-                strokeWidth="2"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.3 }}
-              />
-              <motion.line
-                x1="130" y1="55" x2="100" y2="75"
-                stroke="rgba(127, 156, 245, 0.5)"
-                strokeWidth="2"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-              />
-              <motion.line
-                x1="70" y1="95" x2="100" y2="75"
-                stroke="rgba(127, 156, 245, 0.5)"
-                strokeWidth="2"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
-              />
-              <motion.line
-                x1="130" y1="95" x2="100" y2="75"
-                stroke="rgba(127, 156, 245, 0.5)"
-                strokeWidth="2"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.3, delay: 0.3 }}
-              />
+              <motion.line x1="70" y1="55" x2="100" y2="75" stroke="rgba(127, 156, 245, 0.5)" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.3 }} />
+              <motion.line x1="130" y1="55" x2="100" y2="75" stroke="rgba(127, 156, 245, 0.5)" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.3, delay: 0.1 }} />
+              <motion.line x1="70" y1="95" x2="100" y2="75" stroke="rgba(127, 156, 245, 0.5)" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.3, delay: 0.2 }} />
+              <motion.line x1="130" y1="95" x2="100" y2="75" stroke="rgba(127, 156, 245, 0.5)" strokeWidth="2" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.3, delay: 0.3 }} />
             </>
           )}
         </svg>
-
-        {/* Center node */}
         <motion.div
-          animate={{
-            scale: connected ? [1, 1.2, 1] : 1,
-            boxShadow: connected ? '0 0 30px rgba(127, 156, 245, 0.8)' : '0 0 0px rgba(127, 156, 245, 0)',
-          }}
+          animate={{ scale: connected ? [1, 1.2, 1] : 1, boxShadow: connected ? '0 0 30px rgba(127, 156, 245, 0.8)' : '0 0 0px transparent' }}
           transition={{ duration: 0.5 }}
           className="absolute w-10 h-10 rounded-lg bg-deployers-blue/30 border border-deployers-blue flex items-center justify-center z-10"
         >
           <span className="text-xs font-bold text-white">🔗</span>
         </motion.div>
-
-        {/* Blocks */}
         {blocks.map((block, i) => (
           <motion.div
             key={block.id}
@@ -551,12 +448,7 @@ const BlocksVisual = ({ isHovered }: { isHovered: boolean }) => {
               scale: assembled ? 1 : 0.5,
               rotate: assembled ? 0 : 180,
             }}
-            transition={{
-              type: "spring",
-              stiffness: 200,
-              damping: 20,
-              delay: i * 0.1,
-            }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20, delay: i * 0.1 }}
             className="absolute w-12 h-12 rounded-lg border flex items-center justify-center"
             style={{
               backgroundColor: `${block.color}20`,
@@ -564,9 +456,7 @@ const BlocksVisual = ({ isHovered }: { isHovered: boolean }) => {
               boxShadow: connected ? `0 0 15px ${block.color}40` : 'none',
             }}
           >
-            <span className="text-xs font-bold" style={{ color: block.color }}>
-              {block.label}
-            </span>
+            <span className="text-xs font-bold" style={{ color: block.color }}>{block.label}</span>
           </motion.div>
         ))}
       </div>
@@ -574,75 +464,56 @@ const BlocksVisual = ({ isHovered }: { isHovered: boolean }) => {
   )
 }
 
-// 05. Dashboard Visual - Animated counters
-const DashboardVisual = ({ isHovered }: { isHovered: boolean }) => {
+// 05. Dashboard Visual
+const DashboardVisual = ({ isHovered }: { isHovered: boolean; scrollProgress?: MotionValue<number> }) => {
   const [efficiency, setEfficiency] = useState(0)
   const [growth, setGrowth] = useState(0)
   const [chartProgress, setChartProgress] = useState(0)
   const [notifications, setNotifications] = useState<string[]>([])
   const intervalsRef = useRef<NodeJS.Timeout[]>([])
   const timeoutsRef = useRef<NodeJS.Timeout[]>([])
-
   const notificationsList = ['New client! 🎉', '+$10k revenue', 'Task completed ✓', 'AI deployed 🚀']
 
   useEffect(() => {
-    // Clear all timers when hover state changes
-    intervalsRef.current.forEach(interval => clearInterval(interval))
-    timeoutsRef.current.forEach(timeout => clearTimeout(timeout))
+    intervalsRef.current.forEach((i) => clearInterval(i))
+    timeoutsRef.current.forEach((t) => clearTimeout(t))
     intervalsRef.current = []
     timeoutsRef.current = []
-
     if (isHovered) {
       setEfficiency(0)
       setGrowth(0)
       setChartProgress(0)
       setNotifications([])
-
-      // Animate efficiency
-      const effInterval = setInterval(() => {
-        setEfficiency(prev => {
-          if (prev >= 98) {
-            clearInterval(effInterval)
+      const effId = setInterval(() => {
+        setEfficiency((p) => {
+          if (p >= 98) {
+            clearInterval(effId)
             return 98
           }
-          return prev + 2
+          return p + 2
         })
       }, 30)
-      intervalsRef.current.push(effInterval)
-
-      // Animate growth
-      const growthInterval = setInterval(() => {
-        setGrowth(prev => {
-          if (prev >= 47) {
-            clearInterval(growthInterval)
+      const growthId = setInterval(() => {
+        setGrowth((p) => {
+          if (p >= 47) {
+            clearInterval(growthId)
             return 47
           }
-          return prev + 1
+          return p + 1
         })
       }, 40)
-      intervalsRef.current.push(growthInterval)
-
-      // Animate chart
-      const chartInterval = setInterval(() => {
-        setChartProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(chartInterval)
+      const chartId = setInterval(() => {
+        setChartProgress((p) => {
+          if (p >= 100) {
+            clearInterval(chartId)
             return 100
           }
-          return prev + 2
+          return p + 2
         })
       }, 25)
-      intervalsRef.current.push(chartInterval)
-
-      // Show notifications
+      intervalsRef.current.push(effId, growthId, chartId)
       notificationsList.forEach((notif, i) => {
-        const timeout = setTimeout(() => {
-          if (isHovered) {
-            setNotifications(prev => [...prev, notif])
-            playSound('pop')
-          }
-        }, 500 + i * 600)
-        timeoutsRef.current.push(timeout)
+        timeoutsRef.current.push(setTimeout(() => isHovered && setNotifications((prev) => [...prev, notif]), 500 + i * 600))
       })
     } else {
       setEfficiency(0)
@@ -650,81 +521,47 @@ const DashboardVisual = ({ isHovered }: { isHovered: boolean }) => {
       setChartProgress(0)
       setNotifications([])
     }
-
     return () => {
-      intervalsRef.current.forEach(interval => clearInterval(interval))
-      timeoutsRef.current.forEach(timeout => clearTimeout(timeout))
+      intervalsRef.current.forEach((i) => clearInterval(i))
+      timeoutsRef.current.forEach((t) => clearTimeout(t))
     }
   }, [isHovered])
 
   return (
     <div className="relative w-full h-44 bg-gradient-to-br from-white/[0.02] to-transparent rounded-xl overflow-hidden border border-white/[0.05] p-3">
       <div className="grid grid-cols-3 gap-2 h-full">
-        {/* Stats cards */}
         <div className="bg-white/[0.03] rounded-lg p-2 flex flex-col justify-center items-center">
-          <motion.div 
-            className="text-lg font-bold text-deployers-blue"
-            key={efficiency}
-          >
-            {efficiency}%
-          </motion.div>
+          <motion.div className="text-lg font-bold text-deployers-blue" key={efficiency}>{efficiency}%</motion.div>
           <div className="text-[8px] text-slate-500">Efficiency</div>
         </div>
         <div className="bg-white/[0.03] rounded-lg p-2 flex flex-col justify-center items-center">
-          <motion.div 
-            className="text-lg font-bold text-green-400"
-            key={growth}
-          >
-            +{growth}%
-          </motion.div>
+          <motion.div className="text-lg font-bold text-green-400" key={growth}>+{growth}%</motion.div>
           <div className="text-[8px] text-slate-500">Growth</div>
         </div>
         <div className="bg-white/[0.03] rounded-lg p-2 flex flex-col justify-center items-center relative overflow-hidden">
           <div className="text-lg font-bold text-purple-400">24/7</div>
           <div className="text-[8px] text-slate-500">Active</div>
-          
-          {/* Notifications popup */}
           <AnimatePresence>
-            {notifications.slice(-1).map((notif, i) => (
-              <motion.div
-                key={notif}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -20, opacity: 0 }}
-                className="absolute top-1 right-1 text-[6px] bg-green-500/20 text-green-400 px-1 py-0.5 rounded"
-              >
+            {notifications.slice(-1).map((notif) => (
+              <motion.div key={notif} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }} className="absolute top-1 right-1 text-[6px] bg-green-500/20 text-green-400 px-1 py-0.5 rounded">
                 {notif}
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
-
-        {/* Mini chart */}
         <div className="col-span-3 bg-white/[0.03] rounded-lg p-2">
           <svg className="w-full h-12" viewBox="0 0 200 40" preserveAspectRatio="none">
             <motion.path
               d="M 0 35 Q 25 30, 50 25 T 100 15 T 150 10 T 200 5"
               fill="none"
-              stroke="url(#dashGradient)"
+              stroke="url(#dashGrad)"
               strokeWidth="2"
               initial={{ pathLength: 0 }}
               animate={{ pathLength: chartProgress / 100 }}
               transition={{ duration: 0.05 }}
             />
-            {/* Glow dot at end */}
-            {chartProgress > 10 && (
-              <motion.circle
-                cx={chartProgress * 2}
-                cy={35 - (chartProgress * 0.3)}
-                r="3"
-                fill="#7F9CF5"
-                initial={{ scale: 0 }}
-                animate={{ scale: [1, 1.5, 1] }}
-                transition={{ duration: 0.5, repeat: Infinity }}
-              />
-            )}
             <defs>
-              <linearGradient id="dashGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <linearGradient id="dashGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#7F9CF5" />
                 <stop offset="100%" stopColor="#9EB3FF" />
               </linearGradient>
@@ -736,7 +573,7 @@ const DashboardVisual = ({ isHovered }: { isHovered: boolean }) => {
   )
 }
 
-const visualComponents: { [key: string]: React.FC<{ isHovered: boolean }> } = {
+const visualComponents: Record<string, React.FC<{ isHovered: boolean; scrollProgress?: MotionValue<number> }>> = {
   chat: ChatVisual,
   logos: LogosVisual,
   roadmap: RoadmapVisual,
@@ -744,117 +581,298 @@ const visualComponents: { [key: string]: React.FC<{ isHovered: boolean }> } = {
   dashboard: DashboardVisual,
 }
 
-export default function ProcessSection() {
+// Glassmorphism process card with visual
+function ProcessCard({
+  step,
+  index,
+  fullWidth,
+  isHovered,
+  onMouseEnter,
+  onMouseLeave,
+  scrollProgress,
+}: {
+  step: (typeof processSteps)[0]
+  index: number
+  fullWidth?: boolean
+  isHovered?: boolean
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
+  scrollProgress?: MotionValue<number>
+}) {
+  const Icon = step.icon
+  const VisualComponent = visualComponents[step.visual]
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ duration: 0.5, delay: index * 0.05 }}
+      onMouseEnter={() => {
+        onMouseEnter?.()
+        playSound('hover')
+      }}
+      onMouseLeave={onMouseLeave}
+      whileHover={fullWidth ? undefined : { y: -8, transition: { duration: 0.3, type: 'spring', stiffness: 300, damping: 20 } }}
+      className={`group relative rounded-2xl p-6 flex flex-col ${
+        fullWidth ? 'w-full min-h-[320px]' : 'flex-shrink-0 w-[340px] md:w-[380px] min-h-[420px]'
+      }`}
+      style={{
+        background: 'rgba(255, 255, 255, 0.03)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+      }}
+    >
+      <motion.div animate={{ opacity: isHovered ? 0.05 : 0 }} className="absolute inset-0 rounded-2xl bg-deployers-blue pointer-events-none" />
+      <div className="relative z-10 mb-4">
+        <VisualComponent isHovered={!!isHovered} scrollProgress={scrollProgress} />
+      </div>
+      <div className="flex items-start gap-4 mb-3">
+        <motion.span
+          animate={{ color: isHovered ? 'rgba(127, 156, 245, 0.7)' : 'rgba(127, 156, 245, 0.3)' }}
+          className="text-3xl font-bold transition-colors duration-500 tabular-nums"
+        >
+          {step.number}
+        </motion.span>
+        <h3 className="text-xl font-bold text-white group-hover:text-deployers-light transition-colors duration-300 pt-1 headline">
+          {step.title}
+        </h3>
+      </div>
+      <p className="text-slate-400 text-sm leading-relaxed pl-12 flex-1">{step.description}</p>
+      <motion.div
+        animate={{ opacity: isHovered ? 1 : 0 }}
+        className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-deployers-blue/50 to-transparent rounded-b-2xl"
+      />
+    </motion.div>
+  )
+}
+
+// Desktop: Cinematic horizontal scroll with pinning
+function ProcessSectionDesktop() {
+  const sectionRef = useRef<HTMLDivElement>(null)
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
 
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end end'],
+  })
+
+  // Foreground: cards move at full speed (right to left)
+  const cardX = useTransform(scrollYProgress, [0, 1], [0, -2200])
+  // Background layers at different speeds for parallax depth
+  const bgXSlow = useTransform(scrollYProgress, [0, 1], [0, -350])
+  const bgXMid = useTransform(scrollYProgress, [0, 1], [0, -700])
+  const bgXFast = useTransform(scrollYProgress, [0, 1], [0, -180])
+  // L-line: point de départ ancré au bord droit de la carte 5 (même cardX), le tracé se dessine au scroll
+  const lLineOpacity = useTransform(scrollYProgress, [0.7, 0.78], [0, 1])
+  const lLineDraw = useTransform(scrollYProgress, [0.72, 1], [1, 0])
+  // Bord droit carte 5 ≈ 50vw - 180 + 4*(380+32) + 380 = 50vw + 1848 (en px depuis centre)
+  const lLineOriginX = 1848
+
   return (
-    <section id="process" className="relative px-6 py-20">
-      <div className="max-w-7xl mx-auto w-full">
-        {/* Section Title */}
+    <div ref={sectionRef} className="relative" style={{ height: '400vh' }}>
+      <div className="sticky top-0 h-screen w-full overflow-hidden bg-[#03060f]">
+        {/* Section title - fixed at top */}
+        <div className="absolute top-0 left-0 right-0 z-20 px-6 pt-12 md:pt-16">
+          <div className="max-w-7xl mx-auto flex justify-between items-start">
+            <div className="relative">
+              <div className="absolute inset-0 pointer-events-none select-none z-10" aria-hidden="true">
+                <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold headline text-shine-effect">
+                  Our Process
+                </h2>
+              </div>
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white headline relative">
+                Our Process
+              </h2>
+            </div>
+            <p className="text-slate-500 text-sm hidden md:block max-w-[200px]">
+              Scroll to explore
+            </p>
+          </div>
+        </div>
+
+        {/* Parallax background layers */}
+        <div className="absolute inset-0">
+          <motion.div style={{ x: bgXSlow }} className="absolute inset-0 pointer-events-none overflow-hidden">
+            {['01', '02', '03', '04', '05'].map((num, i) => (
+              <div
+                key={num}
+                className="absolute text-white/[0.04] font-black text-[clamp(5rem,16vw,12rem)] leading-none tracking-tighter select-none"
+                style={{ left: `${6 + i * 16}%`, top: `${12 + (i % 3) * 28}%` }}
+              >
+                {num}
+              </div>
+            ))}
+          </motion.div>
+          <motion.div style={{ x: bgXMid }} className="absolute inset-0 pointer-events-none overflow-hidden">
+            <svg className="absolute w-[200%] h-full opacity-[0.035]" viewBox="0 0 800 400" fill="none">
+              <defs>
+                <pattern id="process-grid" width="80" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 80 0 L 0 0 0 40" stroke="white" strokeWidth="0.5" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#process-grid)" />
+            </svg>
+            <div className="absolute left-[28%] top-[18%] w-44 h-24 border border-white/[0.06] rounded-lg" />
+            <div className="absolute left-[52%] top-[58%] w-28 h-28 border border-white/[0.05] rounded-full" />
+            <div className="absolute left-[72%] top-[22%] w-36 h-18 border border-white/[0.05] rounded" />
+          </motion.div>
+          <motion.div style={{ x: bgXFast }} className="absolute inset-0 pointer-events-none overflow-hidden">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <span
+                key={i}
+                className="absolute text-white/[0.05] text-xl font-mono font-bold"
+                style={{ left: `${8 + (i - 1) * 16}%`, top: `${18 + (i % 5) * 16}%` }}
+              >
+                0{i}
+              </span>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* L-line: point de départ fixe (ancré au bord droit de la carte 5), seul le tracé se dessine au scroll */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, type: "spring", stiffness: 70, damping: 20 }}
-          className="mb-20"
+          style={{
+            opacity: lLineOpacity,
+            left: '50%',
+            marginLeft: lLineOriginX,
+            width: '100vw',
+            x: cardX,
+          }}
+          className="absolute bottom-0 pointer-events-none z-0"
+          aria-hidden
         >
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white">
-            Our Process
-          </h2>
+          <svg
+            className="w-full h-[65vh] min-h-[280px]"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            style={{ display: 'block' }}
+          >
+            <defs>
+              {/* Même style que la ligne entre les logos (conteneur 2) : transparent → lumineux → transparent */}
+              <linearGradient id="l-line-grad" x1="0" y1="48" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="rgba(127, 156, 245, 0)" />
+                <stop offset="12%" stopColor="rgba(127, 156, 245, 0.4)" />
+                <stop offset="50%" stopColor="rgba(127, 156, 245, 0.9)" />
+                <stop offset="88%" stopColor="rgba(127, 156, 245, 0.4)" />
+                <stop offset="100%" stopColor="rgba(127, 156, 245, 0)" />
+              </linearGradient>
+              {/* Glow comme conteneur 2 : 0 0 16px + 0 0 32px */}
+              <filter id="l-line-glow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur1" />
+                <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur2" />
+                <feMerge result="blur">
+                  <feMergeNode in="blur2" />
+                  <feMergeNode in="blur1" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            {/* L: même rendu que le trait entre les logos (conteneur 2) */}
+            <motion.path
+              d="M 0 48 L 100 48 L 100 100"
+              fill="none"
+              stroke="url(#l-line-grad)"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeDasharray="1"
+              pathLength={1}
+              style={{
+                strokeDashoffset: lLineDraw,
+                filter: 'url(#l-line-glow)',
+              }}
+            />
+          </svg>
         </motion.div>
 
-        {/* Process Steps Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {processSteps.map((step, index) => {
-            const VisualComponent = visualComponents[step.visual]
-            const isHovered = hoveredCard === step.number
-            
-            return (
-              <motion.div
+        {/* Foreground: horizontal card strip (au-dessus de la ligne) */}
+        <div className="absolute inset-0 flex items-center z-10">
+          <motion.div
+            style={{ x: cardX }}
+            className="flex gap-6 md:gap-8 pl-[max(1.5rem,calc(50vw-180px))] pr-8"
+          >
+            {processSteps.map((step, index) => (
+              <ProcessCard
                 key={step.number}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.8,
-                  delay: index * 0.1,
-                  type: "spring",
-                  stiffness: 70,
-                  damping: 20,
-                }}
-                whileHover={{
-                  y: -8,
-                  transition: { duration: 0.3, type: "spring", stiffness: 300, damping: 20 },
-                }}
-                onMouseEnter={() => {
-                  setHoveredCard(step.number)
-                  playSound('hover')
-                }}
+                step={step}
+                index={index}
+                isHovered={hoveredCard === step.number}
+                onMouseEnter={() => setHoveredCard(step.number)}
                 onMouseLeave={() => setHoveredCard(null)}
-                className="group relative bg-white/[0.01] backdrop-blur-sm border border-white/[0.03] rounded-2xl p-6 hover:border-deployers-blue/20 transition-all duration-500"
-              >
-                {/* Glow effect on hover */}
-                <motion.div
-                  animate={{
-                    opacity: isHovered ? 0.05 : 0,
-                  }}
-                  className="absolute inset-0 rounded-2xl bg-deployers-blue"
-                />
-                
-                {/* Content */}
-                <div className="relative z-10">
-                  {/* Visual */}
-                  <div className="mb-6">
-                    <VisualComponent isHovered={isHovered} />
-                  </div>
+                scrollProgress={scrollYProgress}
+              />
+            ))}
+          </motion.div>
+        </div>
 
-                  {/* Number & Title Row */}
-                  <div className="flex items-start gap-4 mb-3">
-                    <motion.span
-                      animate={{
-                        color: isHovered ? 'rgba(127, 156, 245, 0.7)' : 'rgba(127, 156, 245, 0.3)',
-                      }}
-                      className="text-3xl font-bold transition-colors duration-500"
-                    >
-                      {step.number}
-                    </motion.span>
-                    <h3 className="text-xl font-bold text-white group-hover:text-deployers-light transition-colors duration-300 pt-1">
-                      {step.title}
-                    </h3>
-                  </div>
+        {/* Gradient fades on edges */}
+        <div
+          className="absolute left-0 top-0 bottom-0 w-24 md:w-32 pointer-events-none z-10"
+          style={{
+            background: 'linear-gradient(to right, #03060f 0%, transparent 100%)',
+          }}
+        />
+        <div
+          className="absolute right-0 top-0 bottom-0 w-24 md:w-32 pointer-events-none z-10"
+          style={{
+            background: 'linear-gradient(to left, #03060f 0%, transparent 100%)',
+          }}
+        />
+      </div>
+    </div>
+  )
+}
 
-                  {/* Description */}
-                  <p className="text-slate-400 text-sm leading-relaxed pl-12">
-                    {step.description}
-                  </p>
-                </div>
-
-                {/* Bottom glow line */}
-                <motion.div
-                  animate={{
-                    opacity: isHovered ? 1 : 0,
-                  }}
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-deployers-blue/50 to-transparent"
-                />
-              </motion.div>
-            )
-          })}
+// Mobile: Clean vertical stack
+function ProcessSectionMobile() {
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+  return (
+    <section id="process" className="relative px-6 py-20 bg-[#03060f] md:hidden">
+      <div className="max-w-2xl mx-auto">
+        <div className="relative mb-16">
+          <div className="absolute inset-0 pointer-events-none select-none z-10" aria-hidden="true">
+            <h2 className="text-5xl font-bold headline text-shine-effect">Our Process</h2>
+          </div>
+          <h2 className="text-5xl font-bold text-white headline relative">Our Process</h2>
+        </div>
+        <div className="space-y-6">
+          {processSteps.map((step, index) => (
+            <ProcessCard
+              key={step.number}
+              step={step}
+              index={index}
+              fullWidth
+              isHovered={hoveredCard === step.number}
+              onMouseEnter={() => setHoveredCard(step.number)}
+              onMouseLeave={() => setHoveredCard(null)}
+            />
+          ))}
         </div>
       </div>
+    </section>
+  )
+}
 
-      {/* Ambient background effects */}
-      <motion.div
-        animate={{
-          opacity: [0.08, 0.15, 0.08],
-          scale: [1, 1.05, 1],
-        }}
-        transition={{
-          duration: 12,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="absolute top-1/4 right-1/4 w-[400px] h-[400px] bg-deployers-blue/10 rounded-full blur-[120px] pointer-events-none"
-      />
+
+export default function ProcessSection() {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  if (isMobile) {
+    return <ProcessSectionMobile />
+  }
+
+  return (
+    <section id="process" className="relative bg-[#03060f]">
+      <ProcessSectionDesktop />
     </section>
   )
 }
