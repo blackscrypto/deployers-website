@@ -21,39 +21,36 @@ export default function Hero() {
   const deployBlur = useTransform(scrollYProgress, [0, 0.5], [0, 2])
 
   const containerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.3
+        staggerChildren: 0.14,
+        delayChildren: 0.25
       }
     }
   }
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 1, y: 36 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
         type: "spring",
-        stiffness: 70,
-        damping: 20
+        stiffness: 65,
+        damping: 22
       }
     }
   }
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen flex items-center justify-center px-6 pt-32 pb-20 overflow-hidden">
-      {/* Animated Mesh Gradient Background - Option 1 */}
+    <section ref={sectionRef} className="relative min-h-screen flex items-center justify-center px-6 pt-32 pb-20 overflow-hidden" style={{ background: 'var(--theme-hero-bg)' }}>
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Base dark background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#0d0d15] to-[#0a0a0f]" />
-        
-        {/* Unified Mesh Gradient - Morphing continuously */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--theme-hero-bg)] via-[var(--theme-section-alt)] to-[var(--theme-hero-bg)]" />
         <motion.div
-          className="absolute inset-0 opacity-50"
+          className="absolute inset-0"
+          style={{ opacity: 'var(--theme-hero-mesh-opacity)', filter: 'blur(100px)' }}
           animate={{
             background: [
               'radial-gradient(at 40% 20%, rgba(99, 102, 241, 0.35) 0%, transparent 50%), radial-gradient(at 80% 80%, rgba(6, 182, 212, 0.3) 0%, transparent 50%), radial-gradient(at 20% 70%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)',
@@ -67,14 +64,11 @@ export default function Hero() {
             repeat: Infinity,
             ease: "linear",
           }}
-          style={{
-            filter: 'blur(100px)',
-          }}
         />
         
-        {/* Secondary layer for more depth */}
         <motion.div
-          className="absolute inset-0 opacity-40"
+          className="absolute inset-0"
+          style={{ opacity: 'calc(var(--theme-hero-mesh-opacity) * 0.8)', filter: 'blur(120px)' }}
           animate={{
             background: [
               'radial-gradient(at 70% 50%, rgba(59, 130, 246, 0.25) 0%, transparent 50%), radial-gradient(at 30% 30%, rgba(168, 85, 247, 0.2) 0%, transparent 50%)',
@@ -88,9 +82,6 @@ export default function Hero() {
             repeat: Infinity,
             ease: "linear",
           }}
-          style={{
-            filter: 'blur(120px)',
-          }}
         />
         
         {/* Noise/Grain Texture Overlay */}
@@ -102,12 +93,7 @@ export default function Hero() {
         />
         
         {/* Smooth gradient fade-out at the bottom */}
-        <div 
-          className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none"
-          style={{
-            background: 'linear-gradient(to bottom, transparent 0%, rgba(3, 6, 15, 0.5) 40%, rgba(3, 6, 15, 1) 100%)',
-          }}
-        />
+        <div className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none" style={{ background: 'var(--theme-hero-fade)' }} />
       </div>
       {/* Content */}
       <motion.div
@@ -135,8 +121,7 @@ export default function Hero() {
             />
           </div>
           
-          {/* Inner background */}
-          <div className="absolute inset-[1px] rounded-full bg-[#0a0a0f]/90 backdrop-blur-sm" />
+          <div className="absolute inset-[1px] rounded-full backdrop-blur-sm" style={{ backgroundColor: 'var(--theme-hero-badge-bg)' }} />
           
           {/* Static glow effect (no rotation) */}
           <div 
@@ -148,7 +133,7 @@ export default function Hero() {
           
           {/* Content */}
           <span className="relative w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="relative text-sm text-slate-300 font-medium tracking-wide">AI Automation Agency</span>
+          <span className="relative text-sm text-theme-text-muted font-medium tracking-wide">AI Automation Agency</span>
         </motion.div>
 
         {/* Main Headline */}
@@ -156,19 +141,18 @@ export default function Hero() {
           variants={itemVariants}
           className="text-6xl md:text-7xl lg:text-8xl font-bold mb-8 headline"
         >
-          <span className="block text-white">Automate.</span>
-          <span className="block text-white">Scale.</span>
+          <span className="block text-theme-text">Automate.</span>
+          <span className="block text-theme-text">Scale.</span>
           <motion.span 
             className="block pb-2 relative"
             style={{ 
               scale: deployScale,
               y: deployY,
               filter: useTransform(deployBlur, (v) => `blur(${v}px)`),
-              color: '#bdd9ff',
+              color: 'var(--theme-hero-deploy-color)',
             }}
           >
             Deploy.
-            {/* Animated glow effect - starts at 0 opacity */}
             <motion.span
               className="absolute inset-0 blur-2xl -z-10 pointer-events-none"
               style={{
@@ -177,7 +161,7 @@ export default function Hero() {
                   deployGlow, 
                   (v) => `0 0 ${v}px rgba(189, 217, 255, 0.8), 0 0 ${v * 1.5}px rgba(127, 156, 245, 0.6), 0 0 ${v * 2}px rgba(99, 102, 241, 0.4)`
                 ),
-                color: '#bdd9ff',
+                color: 'var(--theme-hero-deploy-color)',
               }}
             >
               Deploy.
@@ -188,7 +172,7 @@ export default function Hero() {
         {/* Subheadline */}
         <motion.p
           variants={itemVariants}
-          className="text-xl md:text-2xl text-slate-400 mb-14 max-w-3xl mx-auto leading-relaxed"
+          className="text-xl md:text-2xl text-theme-text-muted mb-14 max-w-3xl mx-auto leading-relaxed"
         >
           Transform your business with cutting-edge AI automation. 
           We build intelligent systems that work while you grow.
@@ -202,7 +186,7 @@ export default function Hero() {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="group px-8 py-4 bg-white text-[#0a0a0f] rounded-full font-semibold text-base shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_60px_rgba(255,255,255,0.15)] transition-all duration-500 flex items-center gap-3"
+            className="group px-8 py-4 bg-theme-text text-theme-page-bg rounded-full font-semibold text-base shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_60px_rgba(255,255,255,0.15)] transition-all duration-500 flex items-center gap-3"
           >
             Start Your Project
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
@@ -211,7 +195,7 @@ export default function Hero() {
           <motion.button
             whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.05)" }}
             whileTap={{ scale: 0.98 }}
-            className="px-8 py-4 bg-transparent border border-white/10 text-white rounded-full font-medium text-base hover:border-white/20 transition-all duration-500"
+            className="px-8 py-4 bg-transparent border border-theme-border text-theme-text rounded-full font-medium text-base hover:border-theme-border-strong transition-all duration-500"
           >
             View Case Studies
           </motion.button>
@@ -228,10 +212,10 @@ export default function Hero() {
             { value: '24/7', label: 'AI Systems Running' }
           ].map((stat, index) => (
             <div key={index} className="text-center">
-              <div className="text-2xl md:text-3xl font-semibold text-white mb-1">
+              <div className="text-2xl md:text-3xl font-semibold text-theme-text mb-1">
                 {stat.value}
               </div>
-              <div className="text-xs md:text-sm text-slate-500 uppercase tracking-wider">
+              <div className="text-xs md:text-sm text-theme-text-subtle uppercase tracking-wider">
                 {stat.label}
               </div>
             </div>

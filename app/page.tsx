@@ -9,7 +9,7 @@ import Footer from '@/components/Footer'
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen bg-midnight-gradient">
+    <main className="relative min-h-screen bg-theme-page">
       <Navbar />
       <Hero />
       <TaglineSection />

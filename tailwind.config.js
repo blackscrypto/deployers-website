@@ -8,6 +8,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        'theme-page-bg': 'var(--theme-page-bg)',
+        'theme-section': 'var(--theme-section)',
+        'theme-text': 'var(--theme-text)',
+        'theme-text-muted': 'var(--theme-text-muted)',
+        'theme-text-subtle': 'var(--theme-text-subtle)',
+        'theme-border': 'var(--theme-border)',
+        'theme-border-strong': 'var(--theme-border-strong)',
+        'theme-surface': 'var(--theme-surface)',
+        'theme-surface-strong': 'var(--theme-surface-strong)',
+        'theme-section': 'var(--theme-section)',
+        'theme-page-bg': 'var(--theme-page-bg)',
         'deployers-blue': {
           DEFAULT: '#7F9CF5',
           light: '#9EB3FF',

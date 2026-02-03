@@ -100,7 +100,7 @@ export function AuditVisual({ isHovered }: { isHovered: boolean }) {
   }, [isHovered])
 
   return (
-    <div className="relative w-full h-52 bg-gradient-to-br from-blue-500/[0.03] to-transparent rounded-xl overflow-hidden border border-blue-500/10">
+    <div className="service-visual-box relative w-full h-52 rounded-xl overflow-hidden">
       <motion.div
         className="absolute left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent"
         style={{ top: `${scanProgress}%` }}
@@ -219,7 +219,7 @@ export function TrainingVisual({ isHovered }: { isHovered: boolean }) {
   }, [isHovered])
 
   return (
-    <div className="relative w-full h-52 bg-gradient-to-br from-violet-500/[0.03] to-transparent rounded-xl overflow-hidden border border-violet-500/10 p-4">
+    <div className="service-visual-box relative w-full h-52 rounded-xl overflow-hidden p-4">
       <motion.div
         animate={{ y: finalZoom ? -40 : -scrollOffset, scale: finalZoom ? 0.85 : 1 }}
         transition={{ type: 'spring', stiffness: 100, damping: 20 }}
@@ -304,7 +304,7 @@ export function SolutionsVisual({ isHovered }: { isHovered: boolean }) {
   }, [isHovered])
 
   return (
-    <div className="relative w-full h-52 bg-gradient-to-br from-cyan-500/[0.03] to-transparent rounded-xl overflow-hidden border border-cyan-500/10 p-4">
+    <div className="service-visual-box relative w-full h-52 rounded-xl overflow-hidden p-4">
       <div className="flex items-center justify-between h-full">
         <motion.div
           initial={{ opacity: 0, x: -20 }}

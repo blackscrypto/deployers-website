@@ -128,22 +128,16 @@ export default function ProjectsSection() {
   const [hoveredProject, setHoveredProject] = useState<number | null>(null)
 
   return (
-    <section id="projects" className="relative px-6 py-20 bg-[#03060f]">
-      {/* Smooth gradient fade-out at the bottom */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-10"
-        style={{
-          background: 'linear-gradient(to bottom, transparent 0%, rgba(3, 6, 15, 0.5) 40%, rgba(3, 6, 15, 1) 100%)',
-        }}
-      />
+    <section id="projects" className="relative px-6 py-20 bg-theme-section">
+      <div className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-10" style={{ background: 'var(--theme-hero-fade)' }} />
       
       <div className="max-w-7xl mx-auto w-full">
         {/* Section Title */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 1, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, type: "spring", stiffness: 70, damping: 20 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, type: "spring", stiffness: 65, damping: 22 }}
           className="mb-20 relative"
         >
           {/* Shine effect overlay */}
@@ -152,7 +146,7 @@ export default function ProjectsSection() {
               Our Projects
             </h2>
           </div>
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white headline relative">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-theme-text headline relative">
             Our Projects
           </h2>
         </motion.div>
@@ -164,32 +158,32 @@ export default function ProjectsSection() {
             {projects.map((project, index) => (
               <motion.div
                 key={project.id}
-                initial={{ opacity: 0, x: -30 }}
+                initial={{ opacity: 1, x: -28 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, margin: "-40px" }}
                 transition={{
                   duration: 0.6,
-                  delay: index * 0.1,
+                  delay: index * 0.08,
                   type: "spring",
                   stiffness: 70,
-                  damping: 20,
+                  damping: 24,
                 }}
                 onMouseEnter={() => setHoveredProject(index)}
                 onMouseLeave={() => setHoveredProject(null)}
                 className="group relative"
               >
-                <div className="flex items-center justify-between py-6 px-4 rounded-xl cursor-pointer transition-all duration-300 hover:bg-white/[0.02]">
+                <div className="flex items-center justify-between py-6 px-4 rounded-xl cursor-pointer transition-all duration-300 hover:bg-theme-surface">
                   {/* Project Info */}
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-1">
-                      <h3 className="text-2xl md:text-3xl font-bold text-white group-hover:text-deployers-light transition-colors duration-300">
+                      <h3 className="text-2xl md:text-3xl font-bold text-theme-text group-hover:text-deployers-light transition-colors duration-300">
                         {project.name}
                       </h3>
-                      <span className="text-xs px-3 py-1 rounded-full bg-white/[0.05] text-slate-400 group-hover:bg-deployers-blue/20 group-hover:text-deployers-light transition-all duration-300">
+                      <span className="text-xs px-3 py-1 rounded-full bg-theme-surface text-theme-text-muted group-hover:bg-deployers-blue/20 group-hover:text-deployers-light transition-all duration-300">
                         {project.category}
                       </span>
                     </div>
-                    <p className="text-slate-500 text-sm max-w-md group-hover:text-slate-400 transition-colors duration-300">
+                    <p className="text-theme-text-subtle text-sm max-w-md group-hover:text-theme-text-muted transition-colors duration-300">
                       {project.description}
                     </p>
                   </div>
@@ -208,17 +202,17 @@ export default function ProjectsSection() {
                 </div>
                 
                 {/* Separator line */}
-                <div className="h-[1px] bg-white/[0.05] group-hover:bg-deployers-blue/20 transition-colors duration-300" />
+                <div className="h-[1px] bg-theme-border group-hover:bg-deployers-blue/20 transition-colors duration-300" />
               </motion.div>
             ))}
           </div>
 
           {/* Visual Orb */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 1, scale: 0.92 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, type: "spring" }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.8, type: "spring", stiffness: 60, damping: 22 }}
             className="hidden lg:block h-[500px]"
           >
             <ProjectVisual activeProject={hoveredProject} />

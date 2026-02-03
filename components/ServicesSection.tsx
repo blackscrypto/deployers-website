@@ -121,7 +121,7 @@ function ServiceCard({
       initial={false}
       animate={{
         scale: isHovered ? 1.02 : 1,
-        opacity: isHovered ? 1 : 0.88,
+        opacity: 1,
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       onMouseEnter={onHoverStart}
@@ -140,16 +140,12 @@ function ServiceCard({
         className="h-full w-full"
       >
         <motion.div
-          className="relative flex h-full flex-col overflow-hidden rounded-xl border bg-white/[0.02] cursor-pointer transition-colors duration-300"
-          style={{
-            minHeight: CARD_HEIGHT,
-            borderColor: isHovered ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.06)',
-            boxShadow: isHovered ? `0 24px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08)` : undefined,
-          }}
-          initial={{ opacity: 0, y: 20 }}
+          className={`relative flex h-full flex-col overflow-hidden rounded-xl border cursor-pointer transition-all duration-300 service-card ${isHovered ? 'service-card-hover' : ''}`}
+          style={{ minHeight: CARD_HEIGHT }}
+          initial={{ opacity: 1, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: index * 0.1 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.6, type: 'spring', stiffness: 70, damping: 24, delay: index * 0.08 }}
         >
           {/* Background glow on hover */}
           <div
@@ -166,7 +162,7 @@ function ServiceCard({
               background: `radial-gradient(ellipse 80% 80% at 50% 20%, ${service.glowColor}, transparent 50%)`,
             }}
           />
-          {isHovered && <div className="absolute inset-0 bg-black/40 pointer-events-none rounded-xl" />}
+          {isHovered && <div className="absolute inset-0 pointer-events-none rounded-xl" style={{ background: 'var(--theme-service-card-overlay)' }} />}
 
           {/* Content — fixed structure, no layout shift */}
           <div className="relative z-10 flex flex-1 flex-col p-6 min-h-0">
@@ -178,7 +174,7 @@ function ServiceCard({
               >
                 <Icon className="w-7 h-7" style={{ color: service.color }} />
               </div>
-              <h3 className="text-xl font-bold text-white">{service.title}</h3>
+              <h3 className="text-xl font-bold text-theme-text">{service.title}</h3>
               <AnimatePresence mode="wait">
                 {!isHovered ? (
                   <motion.p
@@ -186,7 +182,7 @@ function ServiceCard({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="text-slate-400 text-sm mt-1 max-w-xs"
+                    className="text-theme-text-muted text-sm mt-1 max-w-xs"
                   >
                     {service.description}
                   </motion.p>
@@ -196,7 +192,7 @@ function ServiceCard({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="mt-2 flex items-center gap-2 text-white/90"
+                    className="mt-2 flex items-center gap-2 text-theme-text"
                   >
                     <span className="text-sm font-medium">Explore</span>
                     <ChevronRight className="w-4 h-4" />
@@ -243,10 +239,10 @@ function ServiceCard({
                     transition={{ duration: 0.35, delay: 0.05 }}
                     className="flex flex-col gap-3"
                   >
-                    <p className="text-slate-300 text-sm leading-relaxed">{service.detailParagraph}</p>
+                    <p className="text-theme-text-muted text-sm leading-relaxed">{service.detailParagraph}</p>
                     <ul className="space-y-1.5">
                       {service.bullets.map((bullet, i) => (
-                        <li key={i} className="flex items-center gap-2 text-sm text-slate-400">
+                        <li key={i} className="flex items-center gap-2 text-sm text-theme-text-muted">
                           <span
                             className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                             style={{ backgroundColor: service.color }}
@@ -300,21 +296,15 @@ export default function ServicesSection() {
   }, [])
 
   return (
-    <section id="services" className="relative px-6 py-32 bg-[#03060f] overflow-hidden">
-      <div
-        className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-10"
-        style={{
-          background:
-            'linear-gradient(to bottom, transparent 0%, rgba(3, 6, 15, 0.5) 40%, rgba(3, 6, 15, 1) 100%)',
-        }}
-      />
+    <section id="services" className="relative px-6 py-32 bg-theme-section overflow-hidden">
+      <div className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-10" style={{ background: 'var(--theme-hero-fade)' }} />
 
       <div className="max-w-7xl mx-auto w-full">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 1, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, type: 'spring', stiffness: 70, damping: 20 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, type: 'spring', stiffness: 65, damping: 22 }}
           className="mb-20 relative"
         >
           <div className="absolute inset-0 pointer-events-none select-none z-10" aria-hidden="true">
@@ -322,7 +312,7 @@ export default function ServicesSection() {
               Our Services
             </h2>
           </div>
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white headline relative">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-theme-text headline relative">
             Our Services
           </h2>
         </motion.div>

@@ -4,14 +4,8 @@ import { motion } from 'framer-motion'
 
 export default function TaglineSection() {
   return (
-    <section className="relative px-6 pt-8 pb-32 overflow-visible flex items-center justify-center bg-[#03060f]">
-      {/* Smooth gradient fade-out at the bottom */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-10"
-        style={{
-          background: 'linear-gradient(to bottom, transparent 0%, rgba(3, 6, 15, 0.5) 40%, rgba(3, 6, 15, 1) 100%)',
-        }}
-      />
+    <section className="relative px-6 pt-8 pb-32 overflow-visible flex items-center justify-center bg-theme-section">
+      <div className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-10" style={{ background: 'var(--theme-hero-fade)' }} />
       
       <div className="max-w-6xl mx-auto">
         <div className="relative">
@@ -24,23 +18,23 @@ export default function TaglineSection() {
           
           {/* Main text */}
           <motion.h2 
-            initial={{ opacity: 0, y: -40, filter: "blur(20px)" }}
+            initial={{ opacity: 1, y: 28, filter: "blur(6px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            viewport={{ once: true }}
-            transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] }}
             className="text-4xl md:text-5xl lg:text-6xl font-bold leading-loose text-left headline relative"
           >
             <motion.span
-              initial={{ opacity: 0, y: -30, filter: "blur(15px)" }}
+              initial={{ opacity: 1, y: 22, filter: "blur(4px)" }}
               whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              viewport={{ once: true }}
-              transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
-              className="text-white"
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1], delay: 0.08 }}
+              className="text-theme-text"
             >
               We are your AI Partner{' '}
             </motion.span>
           <motion.span
-            initial={{ opacity: 0, y: -30, filter: "blur(15px)" }}
+            initial={{ opacity: 1, y: 22, filter: "blur(4px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true }}
             animate={{
@@ -67,18 +61,18 @@ export default function TaglineSection() {
           </motion.span>
           <br />
           <motion.span
-            initial={{ opacity: 0, y: -30, filter: "blur(15px)" }}
+            initial={{ opacity: 1, y: 22, filter: "blur(4px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.3 }}
-            className="text-white"
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
+            className="text-theme-text"
           >
             We{' '}
           </motion.span>
           <motion.span
-            initial={{ opacity: 0, y: -30, filter: "blur(15px)" }}
+            initial={{ opacity: 1, y: 22, filter: "blur(4px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-80px" }}
             animate={{
               textShadow: [
                 "0 0 20px rgba(127, 156, 245, 0.3)",
@@ -87,7 +81,7 @@ export default function TaglineSection() {
               ]
             }}
             transition={{
-              opacity: { duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 },
+              opacity: { duration: 0.9, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 },
               y: { duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 },
               filter: { duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 },
               textShadow: {
@@ -102,29 +96,29 @@ export default function TaglineSection() {
             transform{' '}
           </motion.span>
           <motion.span
-            initial={{ opacity: 0, y: -30, filter: "blur(15px)" }}
+            initial={{ opacity: 1, y: 22, filter: "blur(4px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.5 }}
-            className="text-white"
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1], delay: 0.32 }}
+            className="text-theme-text"
           >
             businesses{' '}
           </motion.span>
           <br />
           <motion.span
-            initial={{ opacity: 0, y: -30, filter: "blur(15px)" }}
+            initial={{ opacity: 1, y: 22, filter: "blur(4px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.6 }}
-            className="text-white"
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 }}
+            className="text-theme-text"
           >
             into{' '}
           </motion.span>
           <motion.span
-            initial={{ opacity: 0, y: -30, filter: "blur(15px)" }}
+            initial={{ opacity: 1, y: 22, filter: "blur(4px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.7 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1], delay: 0.5 }}
             className="bg-gradient-to-r from-white via-deployers-light to-white bg-clip-text text-transparent"
           >
             AI Leaders.

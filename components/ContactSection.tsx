@@ -40,21 +40,21 @@ export default function ContactSection() {
   }
 
   const inputClasses = (field: string) => `
-    w-full bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-4
-    text-white placeholder-slate-500 outline-none
+    w-full bg-theme-surface border border-theme-border rounded-xl px-4 py-4
+    text-theme-text placeholder-theme-text-subtle outline-none
     transition-all duration-300
-    ${focusedField === field ? 'border-deployers-blue/50 bg-white/[0.04]' : 'hover:border-white/[0.1]'}
+    ${focusedField === field ? 'border-deployers-blue/50 bg-theme-surface-strong' : 'hover:border-theme-border-strong'}
   `
 
   return (
-    <section id="contact" className="relative px-6 py-20 bg-[#03060f]">
+    <section id="contact" className="relative px-6 py-20 bg-theme-section">
       <div className="max-w-7xl mx-auto w-full">
         {/* Section Title */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 1, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, type: "spring", stiffness: 70, damping: 20 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, type: "spring", stiffness: 65, damping: 22 }}
           className="text-center mb-20"
         >
           <div className="relative inline-block">
@@ -64,21 +64,21 @@ export default function ContactSection() {
                 Let's Talk
               </h2>
             </div>
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 headline relative">
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-theme-text mb-6 headline relative">
               Let's Talk
             </h2>
           </div>
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+          <p className="text-xl text-theme-text-muted max-w-2xl mx-auto">
             Ready to transform your business with AI? Tell us about your project and let's build something amazing together.
           </p>
         </motion.div>
 
         {/* Contact Form */}
         <motion.form
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 1, y: 36 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.6, type: "spring", stiffness: 70, damping: 24, delay: 0.15 }}
           onSubmit={handleSubmit}
           className="max-w-4xl mx-auto"
         >
@@ -90,7 +90,7 @@ export default function ContactSection() {
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
             >
-              <label className="block text-sm text-slate-400 mb-2">Your Name *</label>
+              <label className="block text-sm text-theme-text-muted mb-2">Your Name *</label>
               <input
                 type="text"
                 required
@@ -110,7 +110,7 @@ export default function ContactSection() {
               viewport={{ once: true }}
               transition={{ delay: 0.15 }}
             >
-              <label className="block text-sm text-slate-400 mb-2">Email Address *</label>
+              <label className="block text-sm text-theme-text-muted mb-2">Email Address *</label>
               <input
                 type="email"
                 required
@@ -130,7 +130,7 @@ export default function ContactSection() {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              <label className="block text-sm text-slate-400 mb-2">Company</label>
+              <label className="block text-sm text-theme-text-muted mb-2">Company</label>
               <input
                 type="text"
                 placeholder="Your company name"
@@ -149,7 +149,7 @@ export default function ContactSection() {
               viewport={{ once: true }}
               transition={{ delay: 0.25 }}
             >
-              <label className="block text-sm text-slate-400 mb-2">Project Type *</label>
+              <label className="block text-sm text-theme-text-muted mb-2">Project Type *</label>
               <select
                 required
                 value={formData.projectType}
@@ -158,9 +158,9 @@ export default function ContactSection() {
                 onBlur={() => setFocusedField(null)}
                 className={`${inputClasses('projectType')} cursor-pointer`}
               >
-                <option value="" className="bg-midnight-dark">Select a project type</option>
+                <option value="" className="bg-theme-section">Select a project type</option>
                 {projectTypes.map((type) => (
-                  <option key={type} value={type} className="bg-midnight-dark">{type}</option>
+                  <option key={type} value={type} className="bg-theme-section">{type}</option>
                 ))}
               </select>
             </motion.div>
@@ -174,7 +174,7 @@ export default function ContactSection() {
             transition={{ delay: 0.3 }}
             className="mb-6"
           >
-            <label className="block text-sm text-slate-400 mb-3">Budget Range</label>
+            <label className="block text-sm text-theme-text-muted mb-3">Budget Range</label>
             <div className="flex flex-wrap gap-3">
               {budgetRanges.map((range) => (
                 <button
@@ -184,7 +184,7 @@ export default function ContactSection() {
                   className={`px-4 py-2 rounded-full border text-sm transition-all duration-300 ${
                     formData.budget === range
                       ? 'border-deployers-blue bg-deployers-blue/20 text-deployers-light'
-                      : 'border-white/[0.05] text-slate-400 hover:border-white/[0.1] hover:bg-white/[0.02]'
+                      : 'border-theme-border text-theme-text-muted hover:border-theme-border-strong hover:bg-theme-surface'
                   }`}
                 >
                   {range}
@@ -201,7 +201,7 @@ export default function ContactSection() {
             transition={{ delay: 0.35 }}
             className="mb-8"
           >
-            <label className="block text-sm text-slate-400 mb-2">Tell us about your project *</label>
+            <label className="block text-sm text-theme-text-muted mb-2">Tell us about your project *</label>
             <textarea
               required
               rows={5}
@@ -229,7 +229,7 @@ export default function ContactSection() {
                 boxShadow: "0 0 50px rgba(127, 156, 245, 0.4)"
               }}
               whileTap={{ scale: 0.98 }}
-              className="group flex items-center gap-3 px-8 py-4 bg-white text-midnight-dark rounded-full font-bold text-lg shadow-xl hover:shadow-deployers-blue/30 transition-all duration-300"
+              className="group flex items-center gap-3 px-8 py-4 bg-theme-text text-theme-page-bg rounded-full font-bold text-lg shadow-xl hover:shadow-deployers-blue/30 transition-all duration-300"
             >
               Send Message
               <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
@@ -245,10 +245,10 @@ export default function ContactSection() {
           transition={{ delay: 0.5 }}
           className="mt-20 text-center"
         >
-          <p className="text-slate-500 mb-4">Prefer email?</p>
+          <p className="text-theme-text-subtle mb-4">Prefer email?</p>
           <a 
             href="mailto:hello@deployers.ai"
-            className="group inline-flex items-center gap-2 text-2xl md:text-3xl font-bold text-white hover:text-deployers-light transition-colors duration-300"
+            className="group inline-flex items-center gap-2 text-2xl md:text-3xl font-bold text-theme-text hover:text-deployers-light transition-colors duration-300"
           >
             hello@deployers.ai
             <ArrowUpRight className="w-6 h-6 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300" />
