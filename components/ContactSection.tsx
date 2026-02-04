@@ -22,6 +22,8 @@ const budgetRanges = [
   'Not sure yet',
 ]
 
+type SubmitStatus = 'idle' | 'loading' | 'success' | 'error'
+
 export default function ContactSection() {
   const [formData, setFormData] = useState({
     name: '',
@@ -32,11 +34,31 @@ export default function ContactSection() {
     message: '',
   })
   const [focusedField, setFocusedField] = useState<string | null>(null)
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('idle')
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission
-    console.log(formData)
+    setSubmitStatus('loading')
+    setSubmitError(null)
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setSubmitStatus('error')
+        setSubmitError(data.error ?? 'Something went wrong. Please try again.')
+        return
+      }
+      setSubmitStatus('success')
+      setFormData({ name: '', email: '', company: '', projectType: '', budget: '', message: '' })
+    } catch {
+      setSubmitStatus('error')
+      setSubmitError('Network error. Please try again.')
+    }
   }
 
   const inputClasses = (field: string) => `
@@ -58,8 +80,8 @@ export default function ContactSection() {
           className="text-center mb-20"
         >
           <div className="relative inline-block">
-            {/* Shine effect overlay */}
-            <div className="absolute inset-0 pointer-events-none select-none z-10" aria-hidden="true">
+            {/* Shine effect overlay — hidden in light mode */}
+            <div className="title-shine-overlay absolute inset-0 pointer-events-none select-none z-10" aria-hidden="true">
               <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold headline text-shine-effect">
                 Let's Talk
               </h2>
@@ -215,6 +237,17 @@ export default function ContactSection() {
           </motion.div>
 
           {/* Submit Button */}
+          {(submitStatus === 'success' || submitStatus === 'error') && (
+            <motion.p
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`text-center text-sm font-medium mb-4 ${submitStatus === 'success' ? 'text-green-500' : 'text-red-500'}`}
+            >
+              {submitStatus === 'success'
+                ? "Message sent! We'll get back to you soon."
+                : submitError}
+            </motion.p>
+          )}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -224,15 +257,16 @@ export default function ContactSection() {
           >
             <motion.button
               type="submit"
-              whileHover={{ 
+              disabled={submitStatus === 'loading'}
+              whileHover={submitStatus === 'loading' ? undefined : {
                 scale: 1.02,
                 boxShadow: "0 0 50px rgba(127, 156, 245, 0.4)"
               }}
-              whileTap={{ scale: 0.98 }}
-              className="group flex items-center gap-3 px-8 py-4 bg-theme-text text-theme-page-bg rounded-full font-bold text-lg shadow-xl hover:shadow-deployers-blue/30 transition-all duration-300"
+              whileTap={submitStatus === 'loading' ? undefined : { scale: 0.98 }}
+              className="group flex items-center gap-3 px-8 py-4 bg-theme-text text-theme-page-bg rounded-full font-bold text-lg shadow-xl hover:shadow-deployers-blue/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Send Message
-              <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+              {submitStatus === 'loading' ? 'Sending…' : 'Send Message'}
+              <Send className={`w-5 h-5 ${submitStatus === 'loading' ? 'animate-pulse' : 'group-hover:translate-x-1 group-hover:-translate-y-1'} transition-transform duration-300`} />
             </motion.button>
           </motion.div>
         </motion.form>
@@ -247,10 +281,10 @@ export default function ContactSection() {
         >
           <p className="text-theme-text-subtle mb-4">Prefer email?</p>
           <a 
-            href="mailto:hello@deployers.ai"
+            href="mailto:start@deployers.io"
             className="group inline-flex items-center gap-2 text-2xl md:text-3xl font-bold text-theme-text hover:text-deployers-light transition-colors duration-300"
           >
-            hello@deployers.ai
+            start@deployers.io
             <ArrowUpRight className="w-6 h-6 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300" />
           </a>
         </motion.div>

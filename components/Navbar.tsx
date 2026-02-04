@@ -19,35 +19,42 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Logo - Fixed on the left */}
+      {/* Logo — aligné par le centre avec la navbar (l’image peut dépasser vers le haut) */}
       <motion.div
         initial={{ opacity: 1, x: -24 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ type: "spring", stiffness: 70, damping: 22, duration: 0.6 }}
-        className="fixed top-6 left-6 z-50"
+        className="fixed top-6 left-6 z-[60] h-11 flex items-center overflow-visible"
       >
-        <motion.div
+        <motion.a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault()
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }}
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          className="cursor-pointer group"
+          className="cursor-pointer group block w-[100px] h-[100px] rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-deployers-blue/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--theme-hero-bg)]"
+          aria-label="Retour en haut de la page"
         >
+          {/* Recadrage : n’affiche que le centre du PNG pour masquer les marges hautes/basses */}
           <Image
             src={logoSrc}
             alt="Deployers Logo"
             width={100}
             height={100}
-            className="relative transition-all duration-300 group-hover:drop-shadow-[0_0_20px_rgba(127,156,245,0.8)]"
+            className="w-full h-full object-contain transition-all duration-300 group-hover:drop-shadow-[0_0_20px_rgba(127,156,245,0.8)] pointer-events-none"
             priority
           />
-        </motion.div>
+        </motion.a>
       </motion.div>
 
-      {/* Centered Navigation Bar */}
+      {/* Navbar — même hauteur (h-11) et centrée pour aligner le centre avec le logo */}
       <motion.nav
         initial={{ opacity: 1, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 70, damping: 22, delay: 0.08 }}
-        className="fixed top-6 left-0 right-0 z-50 flex justify-center"
+        className="fixed top-6 left-0 right-0 z-50 flex items-center justify-center h-11"
       >
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-0 backdrop-blur-md bg-theme-surface border border-theme-border px-4 py-2">

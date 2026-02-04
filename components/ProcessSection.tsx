@@ -229,6 +229,12 @@ const LogosVisual = ({ isHovered, scrollProgress }: { isHovered: boolean; scroll
   ]
   const row1 = [...logosRow1, ...logosRow1, ...logosRow1]
   const row2 = [...logosRow2, ...logosRow2, ...logosRow2]
+  // En version claire, les logos blancs (#fff) sont invisibles → on affiche un gris foncé
+  const logoColorForTheme = (logo: { color: string }) => {
+    const hex = (logo.color || '').toLowerCase().trim()
+    const isWhiteOrVeryLight = hex === '#ffffff' || hex === '#fff' || hex === 'white'
+    return isLight && isWhiteOrVeryLight ? '#334155' : logo.color
+  }
 
   return (
     <div className="process-visual-box logos-marquee-container relative w-full h-52 rounded-xl overflow-hidden flex flex-col items-center justify-center py-2">
@@ -250,9 +256,9 @@ const LogosVisual = ({ isHovered, scrollProgress }: { isHovered: boolean; scroll
                     isLogoHovered ? 'border-deployers-blue/50 bg-deployers-blue/20' : 'border-white/20 bg-white/[0.08]'
                   }`}
                   style={{
-                    color: isLogoHovered ? logo.color : (isLight ? logo.color : 'rgba(255,255,255,0.65)'),
+                    color: isLight ? logoColorForTheme(logo) : (isLogoHovered ? logo.color : 'rgba(255,255,255,0.65)'),
                     opacity: isLogoHovered ? 1 : (isLight ? 0.85 : 1),
-                    boxShadow: isLogoHovered ? `0 0 24px ${logo.color}60` : (isLight ? `0 1px 4px ${logo.color}25` : '0 2px 8px rgba(0,0,0,0.15)'),
+                    boxShadow: isLogoHovered ? `0 0 24px ${(isLight ? logoColorForTheme(logo) : logo.color)}60` : (isLight ? `0 1px 4px ${logoColorForTheme(logo)}25` : '0 2px 8px rgba(0,0,0,0.15)'),
                   }}
                 >
                   <logo.Icon className="w-5 h-5" />
@@ -301,9 +307,9 @@ const LogosVisual = ({ isHovered, scrollProgress }: { isHovered: boolean; scroll
                   isLogoHovered ? 'border-deployers-blue/50 bg-deployers-blue/20' : 'border-white/20 bg-white/[0.08]'
                 }`}
                 style={{
-                  color: isLogoHovered ? logo.color : (isLight ? logo.color : 'rgba(255,255,255,0.65)'),
+                  color: isLight ? logoColorForTheme(logo) : (isLogoHovered ? logo.color : 'rgba(255,255,255,0.65)'),
                   opacity: isLogoHovered ? 1 : (isLight ? 0.85 : 1),
-                  boxShadow: isLogoHovered ? `0 0 24px ${logo.color}60` : (isLight ? `0 1px 4px ${logo.color}25` : '0 2px 8px rgba(0,0,0,0.15)'),
+                  boxShadow: isLogoHovered ? `0 0 24px ${(isLight ? logoColorForTheme(logo) : logo.color)}60` : (isLight ? `0 1px 4px ${logoColorForTheme(logo)}25` : '0 2px 8px rgba(0,0,0,0.15)'),
                 }}
               >
                 <logo.Icon className="w-5 h-5" />
@@ -472,6 +478,8 @@ const BlocksVisual = ({ isHovered }: { isHovered: boolean; scrollProgress?: Moti
 
 // 05. Dashboard Visual
 const DashboardVisual = ({ isHovered }: { isHovered: boolean; scrollProgress?: MotionValue<number> }) => {
+  const { theme } = useTheme()
+  const isLight = theme === 'light'
   const [efficiency, setEfficiency] = useState(0)
   const [growth, setGrowth] = useState(0)
   const [chartProgress, setChartProgress] = useState(0)
@@ -549,7 +557,13 @@ const DashboardVisual = ({ isHovered }: { isHovered: boolean; scrollProgress?: M
           <div className="text-[8px] text-theme-text-muted font-medium">Active</div>
           <AnimatePresence>
             {notifications.slice(-1).map((notif) => (
-              <motion.div key={notif} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }} className="absolute top-1 right-1 text-[6px] bg-emerald-500/35 text-emerald-300 font-medium px-1 py-0.5 rounded border border-emerald-500/40">
+              <motion.div
+                key={notif}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                className={`absolute top-1 right-1 text-[6px] font-medium px-1 py-0.5 rounded ${isLight ? 'bg-emerald-500/25 text-emerald-700 border border-emerald-500/50' : 'bg-emerald-500/35 text-emerald-300 border border-emerald-500/40'}`}
+              >
                 {notif}
               </motion.div>
             ))}
@@ -675,15 +689,11 @@ function ProcessSectionDesktop() {
         {/* Section title - fixed at top */}
         <div className="absolute top-0 left-0 right-0 z-20 px-6 pt-12 md:pt-16">
           <div className="max-w-7xl mx-auto flex justify-between items-start">
-            <div className="relative">
-              <div className="absolute inset-0 pointer-events-none select-none z-10" aria-hidden="true">
-                <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold headline text-shine-effect">
-                  Our Process
-                </h2>
-              </div>
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-theme-text headline relative">
+            <div className="relative inline-block">
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-theme-text headline">
                 Our Process
               </h2>
+              <div className="absolute -bottom-2 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-deployers-blue to-transparent rounded-full shadow-[0_0_12px_rgba(127,156,245,0.5)]" aria-hidden="true" />
             </div>
             <p className="text-theme-text-muted text-sm hidden md:block max-w-[200px]">
               Scroll to explore
@@ -830,11 +840,9 @@ function ProcessSectionMobile() {
   return (
     <section id="process" className="relative px-6 py-20 bg-theme-section md:hidden">
       <div className="max-w-2xl mx-auto">
-        <div className="relative mb-16">
-          <div className="absolute inset-0 pointer-events-none select-none z-10" aria-hidden="true">
-            <h2 className="text-5xl font-bold headline text-shine-effect">Our Process</h2>
-          </div>
-          <h2 className="text-5xl font-bold text-theme-text headline relative">Our Process</h2>
+        <div className="relative inline-block mb-16">
+          <h2 className="text-5xl font-bold text-theme-text headline">Our Process</h2>
+          <div className="absolute -bottom-2 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-deployers-blue to-transparent rounded-full shadow-[0_0_12px_rgba(127,156,245,0.5)]" aria-hidden="true" />
         </div>
         <div className="space-y-6">
           {processSteps.map((step, index) => (

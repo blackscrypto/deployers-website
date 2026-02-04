@@ -147,22 +147,13 @@ function ServiceCard({
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.6, type: 'spring', stiffness: 70, damping: 24, delay: index * 0.08 }}
         >
-          {/* Background glow on hover */}
-          <div
-            className="absolute inset-0 pointer-events-none rounded-xl transition-opacity duration-500"
-            style={{
-              opacity: isHovered ? 1 : 0,
-              background: `linear-gradient(135deg, ${service.color}12 0%, transparent 50%, ${service.glowColor}15 100%)`,
-            }}
+          {/* Même effet que Our Process : overlay coloré à faible opacité au survol (bleu / violet / cyan) */}
+          <motion.div
+            animate={{ opacity: isHovered ? 0.06 : 0 }}
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0 rounded-xl pointer-events-none"
+            style={{ backgroundColor: service.color }}
           />
-          <div
-            className="absolute inset-0 pointer-events-none rounded-xl transition-opacity duration-500"
-            style={{
-              opacity: isHovered ? 1 : 0,
-              background: `radial-gradient(ellipse 80% 80% at 50% 20%, ${service.glowColor}, transparent 50%)`,
-            }}
-          />
-          {isHovered && <div className="absolute inset-0 pointer-events-none rounded-xl" style={{ background: 'var(--theme-service-card-overlay)' }} />}
 
           {/* Content — fixed structure, no layout shift */}
           <div className="relative z-10 flex flex-1 flex-col p-6 min-h-0">
@@ -259,12 +250,13 @@ function ServiceCard({
             </div>
           </div>
 
-          {/* Bottom accent line */}
+          {/* Bottom accent line — même effet que Our Process (dégradé + glow), couleur par service */}
           <div
-            className="absolute bottom-0 left-0 right-0 h-[2px] rounded-b-xl transition-opacity duration-500"
+            className="absolute bottom-0 left-0 right-0 h-[3px] rounded-b-xl transition-opacity duration-500"
             style={{
               opacity: isHovered ? 1 : 0,
-              background: `linear-gradient(90deg, transparent, ${service.color}80, transparent)`,
+              background: `linear-gradient(90deg, transparent, ${service.color}, transparent)`,
+              boxShadow: isHovered ? `0 0 12px ${service.glowColor}` : 'none',
             }}
           />
         </motion.div>
@@ -305,16 +297,12 @@ export default function ServicesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.7, type: 'spring', stiffness: 65, damping: 22 }}
-          className="mb-20 relative"
+          className="mb-20 relative inline-block"
         >
-          <div className="absolute inset-0 pointer-events-none select-none z-10" aria-hidden="true">
-            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold headline text-shine-effect">
-              Our Services
-            </h2>
-          </div>
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-theme-text headline relative">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-theme-text headline">
             Our Services
           </h2>
+          <div className="absolute -bottom-2 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-deployers-blue to-transparent rounded-full shadow-[0_0_12px_rgba(127,156,245,0.5)]" aria-hidden="true" />
         </motion.div>
 
         {/* Fixed grid: 3 equal columns — no flex growth = no layout jump */}

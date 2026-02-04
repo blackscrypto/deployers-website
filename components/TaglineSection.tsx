@@ -1,16 +1,19 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useTheme } from '@/context/ThemeContext'
 
 export default function TaglineSection() {
+  const { theme } = useTheme()
+  const isLight = theme === 'light'
   return (
     <section className="relative px-6 pt-8 pb-32 overflow-visible flex items-center justify-center bg-theme-section">
       <div className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-10" style={{ background: 'var(--theme-hero-fade)' }} />
       
       <div className="max-w-6xl mx-auto">
         <div className="relative">
-          {/* Shine effect overlay */}
-          <div className="absolute inset-0 pointer-events-none select-none z-10" aria-hidden="true">
+          {/* Shine effect overlay — hidden in light mode so the phrase stays readable */}
+          <div className="tagline-shine-overlay absolute inset-0 pointer-events-none select-none z-10" aria-hidden="true">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-loose text-left headline text-shine-effect">
               We are your AI Partner 360° We transform businesses into AI Leaders.
             </h2>
@@ -119,7 +122,7 @@ export default function TaglineSection() {
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1], delay: 0.5 }}
-            className="bg-gradient-to-r from-white via-deployers-light to-white bg-clip-text text-transparent"
+            className={isLight ? 'text-theme-text' : 'bg-gradient-to-r from-white via-deployers-light to-white bg-clip-text text-transparent'}
           >
             AI Leaders.
           </motion.span>

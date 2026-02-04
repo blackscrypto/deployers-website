@@ -251,4 +251,10 @@
   filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
 }
 
+/* Light mode: hide metallic shine overlay so titles stay readable */
+[data-theme="light"] .tagline-shine-overlay,
+[data-theme="light"] .title-shine-overlay {
+  display: none;
+}
+
 /* --- Our Services: styles are inline / Tailwind in ServicesSection.tsx --- */
